@@ -1,0 +1,80 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+[ExecuteInEditMode]
+public class SamenNetworkObject : MonoBehaviour
+{
+    public string id;
+    // Serialized Values
+    private Vector3 cachedPosition;
+    private Vector3 cachedScale;
+    private Quaternion cachedRotation;
+    private void CacheValues()
+    {
+        cachedPosition = transform.localPosition;
+        cachedScale = transform.localScale;
+        cachedRotation = transform.localRotation;
+    }
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public void Create()
+    {
+        if(id == null)
+        {
+            id = Guid.NewGuid().ToString();
+        }
+
+        CacheValues();
+    }
+
+    public void ApplyChange(SessionChange sessionChange)
+    {
+        switch (sessionChange.type)
+        {
+            case SessionChangeType.Position:
+                transform.localPosition = new Vector3(sessionChange.values[0], sessionChange.values[1], sessionChange.values[2]);
+                break;
+
+            case SessionChangeType.Scale:
+                transform.localScale = new Vector3(sessionChange.values[0], sessionChange.values[1], sessionChange.values[2]);
+                break;
+
+            case SessionChangeType.Rotation:
+                transform.localRotation = new Quaternion(sessionChange.values[0], sessionChange.values[1], sessionChange.values[2], sessionChange.values[3]);
+                break;
+
+            default:
+                Debug.LogWarning("Unsupported SessionChangeType: " + sessionChange.type);
+                break;
+        }
+
+        CacheValues();
+    }
+
+    public List<SessionChange> GetChanges()
+    {
+        List<SessionChange> changes = new List<SessionChange>();
+
+        if (transform.localPosition != cachedPosition)
+        {
+            cachedPosition = transform.localPosition;
+            changes.Add(new SessionChange(id, SessionChangeType.Position, new float[] { cachedPosition.x, cachedPosition.y, cachedPosition.z }));
+        }
+
+        if (transform.localScale != cachedScale)
+        {
+            cachedScale = transform.localScale;
+            changes.Add(new SessionChange(id, SessionChangeType.Scale, new float[] { cachedScale.x, cachedScale.y, cachedScale.z }));
+        }
+
+        if (transform.localRotation != cachedRotation)
+        {
+            cachedRotation = transform.localRotation;
+            changes.Add(new SessionChange(id, SessionChangeType.Rotation, new float[] { cachedRotation.x, cachedRotation.y, cachedRotation.z, cachedRotation.w }));
+        }
+
+        return changes;
+    }
+
+}
