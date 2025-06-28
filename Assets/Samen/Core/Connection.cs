@@ -98,8 +98,6 @@ namespace Samen
 
             client.GetStream().Write(size, 0, 4);
             client.GetStream().Write(data, 0, data.Length);
-
-            Debug.Log("Sending packet of type " + outgoingPacket.packetType);
         }
 
         private int expected = -1;
