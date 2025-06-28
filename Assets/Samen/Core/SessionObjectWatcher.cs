@@ -19,6 +19,7 @@ public static class SessionObjectWatcher
 
     private static void UpdateDestroy()
     {
+        // Check if any destroy packets where recieved.
         Connection.GetConnection().Listen(PacketType.ObjectDestroyed, (packet) =>
         {
             SamenNetworkObject destroyedObject = GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None)
@@ -31,6 +32,7 @@ public static class SessionObjectWatcher
                     KnownObjectIds[i] = null;
             }    
 
+            // Destroy the object to sync back with the server
             GameObject.DestroyImmediate(destroyedObject.gameObject);
         });
     }
@@ -55,8 +57,11 @@ public static class SessionObjectWatcher
 
         foreach (string id in KnownObjectIds)
         {
+
+            // The object was deleted on our end!
             if (!currentIds.Contains(id) && id != null)
             {
+                // Send a packet to destroy the object server side!
                 Connection.GetConnection().SendPacket(new OutgoingPacket(PacketType.ObjectDestroyed).WriteString(id));
                 Debug.Log($"SamenNetworkObject with Id {id} was destroyed or removed from the scene.");
             }

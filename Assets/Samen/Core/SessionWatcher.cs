@@ -19,8 +19,16 @@ public class SessionWatcher
     {
         EditorApplication.update += OnEditorTick;
         Connection.OnConnect += RegisterList;
+        EditorSceneManager.sceneDirtied += OnSceneDirtied;
     }
 
+    private static void OnSceneDirtied(Scene scene)
+    {
+        if(SessionManager.InSessionScene())
+        {
+            EditorSceneManager.SaveScene(scene);
+        }
+    }
 
     private static void RegisterList()
     {

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+// Any object in a session has this
 [ExecuteInEditMode]
 public class SamenNetworkObject : MonoBehaviour
 {
@@ -17,7 +19,9 @@ public class SamenNetworkObject : MonoBehaviour
         cachedRotation = transform.localRotation;
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    /// <summary>
+    /// Internal use only.
+    /// </summary>
     public void Create()
     {
         if(id == null)
@@ -28,6 +32,10 @@ public class SamenNetworkObject : MonoBehaviour
         CacheValues();
     }
 
+    /// <summary>
+    /// Apply a change comming from the server
+    /// </summary>
+    /// <param name="sessionChange"></param>
     public void ApplyChange(SessionChange sessionChange)
     {
         switch (sessionChange.type)
@@ -52,6 +60,10 @@ public class SamenNetworkObject : MonoBehaviour
         CacheValues();
     }
 
+    /// <summary>
+    /// Returns a list of any changes if they are required to be send.
+    /// </summary>
+    /// <returns></returns>
     public List<SessionChange> GetChanges()
     {
         List<SessionChange> changes = new List<SessionChange>();

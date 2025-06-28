@@ -210,6 +210,9 @@ public class SceneSettings
         EditorUtility.ClearProgressBar();
         SessionManager.OnSessionJoin?.Invoke();
 
+        SessionUI.GetWindow<SessionUI>();
+        SessionManager.CurrentDataPath = path;
+
 
     }
 }

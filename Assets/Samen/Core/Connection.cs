@@ -23,6 +23,8 @@ namespace Samen
 
         private static void OnEditorUpdate()
         {
+
+            // Make sure that we read any incoming packets, as often as possible
             Connection connection = Connection.GetConnection();
             if (connection != null)
                 connection.ReadPackets();

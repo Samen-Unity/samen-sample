@@ -10,6 +10,12 @@ namespace Samen
 {
     public class SessionManager
     {
+        public static string CurrentDataPath;
+
+        /// <summary>
+        /// Returns true if the editor has the session scene loaded, false if otherwise.
+        /// </summary>
+        /// <returns></returns>
         public static bool InSessionScene()
         {
             Scene activeScene = SceneManager.GetActiveScene();

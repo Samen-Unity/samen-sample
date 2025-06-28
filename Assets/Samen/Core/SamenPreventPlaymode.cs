@@ -2,6 +2,10 @@ using Samen;
 using UnityEditor;
 using UnityEngine;
 
+
+/// <summary>
+/// Script that prevents playmode from being started during a session.
+/// </summary>
 [InitializeOnLoad]
 public class SamenPreventPlaymode
 {
@@ -12,6 +16,7 @@ public class SamenPreventPlaymode
 
     private static void OnPlayModeStateChanged(PlayModeStateChange state)
     {
+        // Check if we are in a session
         if (!SessionManager.InSessionScene())
             return;
 
