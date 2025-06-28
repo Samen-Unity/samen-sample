@@ -38,7 +38,8 @@ namespace Samen
         JoinSession,
         ObjectChange,
         RequestSync,
-        ObjectDestroyed
+        ObjectDestroyed,
+        ObjectDuplicate
     }
 
     public class Connection

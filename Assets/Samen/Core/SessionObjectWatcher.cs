@@ -12,12 +12,12 @@ public static class SessionObjectWatcher
     {
         EditorApplication.hierarchyChanged += OnHierarchyChanged;
         SessionManager.OnSessionJoin += RefreshList;
-        Connection.OnConnect += UpdateDestroy;
+        Connection.OnConnect += UpdateListeners;
     }
 
     private static string[] KnownObjectIds;
 
-    private static void UpdateDestroy()
+    private static void UpdateListeners()
     {
         // Check if any destroy packets where recieved.
         Connection.GetConnection().Listen(PacketType.ObjectDestroyed, (packet) =>
@@ -34,6 +34,16 @@ public static class SessionObjectWatcher
 
             // Destroy the object to sync back with the server
             GameObject.DestroyImmediate(destroyedObject.gameObject);
+        });
+
+        Connection.GetConnection().Listen(PacketType.ObjectDuplicate, (packet) =>
+        {
+            SamenNetworkObject duplicatedObject = GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None)
+                .Where(obj => obj.id == packet.GetString(0))
+                .First();
+
+            GameObject createdObject = GameObject.Instantiate(duplicatedObject.gameObject);
+            createdObject.GetComponent<SamenNetworkObject>().id = packet.GetString(1);
         });
     }
 

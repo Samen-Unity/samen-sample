@@ -1,3 +1,4 @@
+using Samen;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,32 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class SamenNetworkObject : MonoBehaviour
 {
+    private void Start()
+    {
+        SamenNetworkObject[] existingObjects = GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None); 
+        foreach (SamenNetworkObject samenNetworkObject in existingObjects)
+        {
+            if (samenNetworkObject == this)
+                continue;
+
+            if(samenNetworkObject.id == this.id)
+            {
+                // Create a new ID for ourselfs
+                this.id = null;
+                Create();
+
+
+                Connection.GetConnection().SendPacket(new OutgoingPacket(PacketType.ObjectDuplicate)
+                    .WriteString(samenNetworkObject.id) // The ID of the object duplicated
+                    .WriteString(this.id) // Our new id
+                    );
+
+                Debug.Log("Duplication send, new is");
+
+            }
+        }
+    }
+
     public string id;
     // Serialized Values
     private Vector3 cachedPosition;
@@ -61,7 +88,7 @@ public class SamenNetworkObject : MonoBehaviour
     }
 
     /// <summary>
-    /// Returns a list of any changes if they are required to be send.
+    /// Returns a list of any changes if they are required to be send.  
     /// </summary>
     /// <returns></returns>
     public List<SessionChange> GetChanges()
