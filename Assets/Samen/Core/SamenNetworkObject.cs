@@ -8,6 +8,7 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class SamenNetworkObject : MonoBehaviour
 {
+
     private void Start()
     {
         SamenNetworkObject[] existingObjects = GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None); 

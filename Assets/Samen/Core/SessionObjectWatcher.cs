@@ -60,6 +60,17 @@ public static class SessionObjectWatcher
         if (!SessionManager.InSessionScene() || KnownObjectIds == null)
             return;
 
+
+        foreach(GameObject gameObject in Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None))
+        {
+
+            if(gameObject.GetComponent<SamenNetworkObject>() == null)
+            {
+                GameObject.DestroyImmediate(gameObject);
+                EditorUtility.DisplayDialog("Woops!", "Creating objects like that is not (yet) supported.", "Okay");
+            }
+        }
+
         var currentIds = GameObject
             .FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None)
             .Select(obj => obj.id)
@@ -78,6 +89,9 @@ public static class SessionObjectWatcher
         }
 
         KnownObjectIds = currentIds.ToArray();
+
+
+
     }
 
 }
