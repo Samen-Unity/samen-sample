@@ -1,4 +1,5 @@
-﻿using Samen.Network;
+﻿using Assets.Samen.Session.Changes;
+using Samen.Network;
 using Samen.UI;
 using System;
 using System.Collections.Generic;
@@ -75,6 +76,13 @@ namespace Samen.Session
 
             SamenWindow.GetWindow<SamenWindow>();
             CurrentDataPath = assetPath;
+
+            var currentIds = GameObject
+            .FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None)
+            .Select(obj => obj.id)
+            .ToHashSet();
+
+            SessionHierarchyWatcher.KnownObjectIds = currentIds.ToArray();
         }
 
         /// <summary>

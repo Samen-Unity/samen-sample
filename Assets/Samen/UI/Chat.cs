@@ -27,6 +27,8 @@ namespace Samen.UI
         static string currentMessage;
         public static void CreateChatUI()
         {
+            EditorGUILayout.Space(25);
+            EditorGUILayout.LabelField("Chat", EditorStyles.boldLabel);
             scrollPos = EditorGUILayout.BeginScrollView(new Vector2(0, scrollPos), GUILayout.Height(200)).y;
 
             foreach (ChatMessage message in chatMessages)

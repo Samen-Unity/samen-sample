@@ -1,10 +1,13 @@
-﻿using Samen.Network;
+﻿using Assets.Samen.Session.Changes;
+using Samen.Network;
 using Samen.UI;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -14,7 +17,6 @@ namespace Samen.Session
     [InitializeOnLoad]
     public class SessionChangePacketListener
     {
-        private static string[] KnownObjectIds;
         static SessionChangePacketListener()
         {
             Connection.OnConnect += StartListening;
@@ -27,7 +29,93 @@ namespace Samen.Session
             Connection.GetConnection().Listen(PacketType.ObjectChange, OnObjectTransformChangePacket);
             Connection.GetConnection().Listen(PacketType.ChatMessage, OnChatMessagePacket);
             Connection.GetConnection().Listen(PacketType.ParentChange, OnParentChangePacket);
+            Connection.GetConnection().Listen(PacketType.PrefabCreated, OnPrefabCreatedPacket);
         }
+
+        static void OnPrefabCreatedPacket(IncomingPacket packet)
+        {
+            if (!SessionManager.InSessionScene())
+                return;
+
+            // Load the prefab asset from the project
+            string assetPath = packet.GetString(0);
+            GameObject prefabAsset = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+
+            Debug.Log("Loading prefab from " + assetPath);
+
+            if (prefabAsset == null)
+            {
+                Debug.LogError($"Failed to load prefab at path: {assetPath}");
+                return;
+            }
+
+            GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefabAsset);
+            instance.AddComponent<DontUpload>();
+
+            if (instance == null)
+            {
+                Debug.LogError("Failed to instantiate prefab.");
+                return;
+            }
+
+            int idCount = packet.GetInt(1);
+            string[] ids = new string[idCount];
+
+            for (int i = 0; i < idCount; i++)
+            {
+                ids[i] = packet.GetString(2 + i);
+            }
+
+            AddObjectIdsToPrefab(instance, ids);
+
+            GameObject.DestroyImmediate(instance.GetComponent<DontUpload>());
+        }
+
+
+        static void AddObjectIdsToPrefab(GameObject prefab, string[] ids)
+        {
+            if (prefab == null || ids == null || ids.Length == 0)
+            {
+                Debug.LogError("Invalid prefab or ID list.");
+                return;
+            }
+
+            // Collect all GameObjects in hierarchy in top-down order
+            List<GameObject> allObjects = new List<GameObject>();
+            CollectHierarchy(prefab.transform, allObjects);
+
+            if (allObjects.Count != ids.Length)
+            {
+                Debug.LogError($"ID count mismatch. Found {allObjects.Count} GameObjects, but received {ids.Length} IDs.");
+                return;
+            }
+
+            for (int i = 0; i < allObjects.Count; i++)
+            {
+                GameObject obj = allObjects[i];
+                SamenNetworkObject netObj = obj.GetComponent<SamenNetworkObject>();
+
+                if (netObj == null)
+                {
+                    netObj = obj.AddComponent<SamenNetworkObject>();
+                }
+
+                netObj.id = ids[i];
+            }
+
+            Debug.Log($"Assigned {ids.Length} network IDs to prefab instance '{prefab.name}'");
+        }
+
+        static void CollectHierarchy(Transform root, List<GameObject> result)
+        {
+            result.Add(root.gameObject);
+
+            for (int i = 0; i < root.childCount; i++)
+            {
+                CollectHierarchy(root.GetChild(i), result);
+            }
+        }
+
 
         static void OnParentChangePacket(IncomingPacket packet)
         {
@@ -95,10 +183,10 @@ namespace Samen.Session
                     .Where(obj => obj.id == packet.GetString(0))
                     .First();
 
-            for (int i = 0; i < KnownObjectIds.Length; i++)
+            for (int i = 0; i < SessionHierarchyWatcher.KnownObjectIds.Length; i++)
             {
-                if (KnownObjectIds[i] == destroyedObject.id)
-                    KnownObjectIds[i] = null;
+                if (SessionHierarchyWatcher.KnownObjectIds[i] == destroyedObject.id)
+                    SessionHierarchyWatcher.KnownObjectIds[i] = null;
             }
 
             // Destroy the object to sync back with the server
