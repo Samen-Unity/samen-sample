@@ -26,15 +26,48 @@ namespace Samen.Session
             Connection.GetConnection().Listen(PacketType.ObjectDuplicate, OnObjectDuplicatedPacket);
             Connection.GetConnection().Listen(PacketType.ObjectChange, OnObjectTransformChangePacket);
             Connection.GetConnection().Listen(PacketType.ChatMessage, OnChatMessagePacket);
+            Connection.GetConnection().Listen(PacketType.ParentChange, OnParentChangePacket);
         }
 
+        static void OnParentChangePacket(IncomingPacket packet)
+        {
+            if (!SessionManager.InSessionScene())
+                return;
+
+
+            SamenNetworkObject childObject = GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None)
+                    .Where(obj => obj.id == packet.GetString(0))
+                    .First();
+
+            string parentId = packet.GetString(1);
+
+            if(parentId == "none")
+            {
+                childObject.transform.parent = null;
+            }
+            else
+            {
+                SamenNetworkObject parentObject = GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None)
+                    .Where(obj => obj.id == parentId)
+                    .First();
+
+                childObject.transform.parent = parentObject.transform;
+            }
+        }
 
         static void OnChatMessagePacket(IncomingPacket packet)
         {
+            if (!SessionManager.InSessionScene())
+                return;
+
             Chat.AddMessage(new ChatMessage(packet.GetString(0), packet.GetString(1)));
         }
+
         static void OnObjectTransformChangePacket(IncomingPacket packet)
         {
+            if (!SessionManager.InSessionScene())
+                return;
+
             // This is us getting a change from the server
             float[] values = new float[packet.GetInt(2)];
             for (int i = 0; i < values.Length; i++)
@@ -55,6 +88,9 @@ namespace Samen.Session
 
         static void OnObjectDestroyedPacket(IncomingPacket packet)
         {
+            if (!SessionManager.InSessionScene())
+                return;
+
             SamenNetworkObject destroyedObject = GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None)
                     .Where(obj => obj.id == packet.GetString(0))
                     .First();
@@ -71,6 +107,9 @@ namespace Samen.Session
 
         static void OnObjectDuplicatedPacket(IncomingPacket packet)
         {
+            if (!SessionManager.InSessionScene())
+                return;
+
             SamenNetworkObject duplicatedObject = GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None)
                 .Where(obj => obj.id == packet.GetString(0))
                 .First();

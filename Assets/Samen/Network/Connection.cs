@@ -24,7 +24,8 @@ namespace Samen.Network
         RequestSync,
         ObjectDestroyed,
         ObjectDuplicate,
-        ChatMessage
+        ChatMessage,
+        ParentChange
     }
 
     public enum ConnectionState

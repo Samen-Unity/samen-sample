@@ -30,8 +30,6 @@ public class SamenNetworkObject : MonoBehaviour
                     .WriteString(this.id) // Our new id
                     );
 
-                Debug.Log("Duplication send, new is");
-
             }
         }
     }
@@ -117,5 +115,24 @@ public class SamenNetworkObject : MonoBehaviour
 
         return changes;
     }
+
+    public void OnTransformParentChanged()
+    {
+        Debug.Log("Parent Changed!");
+
+
+        string parentId = "none";
+        if (transform.parent != null)
+        {
+            SamenNetworkObject parent = transform.parent.GetComponent<SamenNetworkObject>();
+            parentId = parent.id;
+        }
+
+        Connection.GetConnection().SendPacket(new OutgoingPacket(PacketType.ParentChange)
+            .WriteString(id)
+            .WriteString(parentId));
+    }
+
+
 
 }
