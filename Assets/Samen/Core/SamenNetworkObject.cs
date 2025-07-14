@@ -1,4 +1,5 @@
 using Samen;
+using Samen.Network;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -64,19 +65,19 @@ public class SamenNetworkObject : MonoBehaviour
     /// Apply a change comming from the server
     /// </summary>
     /// <param name="sessionChange"></param>
-    public void ApplyChange(SessionChange sessionChange)
+    public void ApplyChange(TransformChange sessionChange)
     {
         switch (sessionChange.type)
         {
-            case SessionChangeType.Position:
+            case TransformChangeType.Position:
                 transform.localPosition = new Vector3(sessionChange.values[0], sessionChange.values[1], sessionChange.values[2]);
                 break;
 
-            case SessionChangeType.Scale:
+            case TransformChangeType.Scale:
                 transform.localScale = new Vector3(sessionChange.values[0], sessionChange.values[1], sessionChange.values[2]);
                 break;
 
-            case SessionChangeType.Rotation:
+            case TransformChangeType.Rotation:
                 transform.localRotation = new Quaternion(sessionChange.values[0], sessionChange.values[1], sessionChange.values[2], sessionChange.values[3]);
                 break;
 
@@ -92,26 +93,26 @@ public class SamenNetworkObject : MonoBehaviour
     /// Returns a list of any changes if they are required to be send.  
     /// </summary>
     /// <returns></returns>
-    public List<SessionChange> GetChanges()
+    public List<TransformChange> GetChanges()
     {
-        List<SessionChange> changes = new List<SessionChange>();
+        List<TransformChange> changes = new List<TransformChange>();
 
         if (transform.localPosition != cachedPosition)
         {
             cachedPosition = transform.localPosition;
-            changes.Add(new SessionChange(id, SessionChangeType.Position, new float[] { cachedPosition.x, cachedPosition.y, cachedPosition.z }));
+            changes.Add(new TransformChange(id, TransformChangeType.Position, new float[] { cachedPosition.x, cachedPosition.y, cachedPosition.z }));
         }
 
         if (transform.localScale != cachedScale)
         {
             cachedScale = transform.localScale;
-            changes.Add(new SessionChange(id, SessionChangeType.Scale, new float[] { cachedScale.x, cachedScale.y, cachedScale.z }));
+            changes.Add(new TransformChange(id, TransformChangeType.Scale, new float[] { cachedScale.x, cachedScale.y, cachedScale.z }));
         }
 
         if (transform.localRotation != cachedRotation)
         {
             cachedRotation = transform.localRotation;
-            changes.Add(new SessionChange(id, SessionChangeType.Rotation, new float[] { cachedRotation.x, cachedRotation.y, cachedRotation.z, cachedRotation.w }));
+            changes.Add(new TransformChange(id, TransformChangeType.Rotation, new float[] { cachedRotation.x, cachedRotation.y, cachedRotation.z, cachedRotation.w }));
         }
 
         return changes;
