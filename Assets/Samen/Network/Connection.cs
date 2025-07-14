@@ -51,7 +51,7 @@ namespace Samen.Network
         /// <param name="ip"></param>
         /// <param name="port"></param>
         /// <param name="username"></param>
-        public static void Connect(string ip, string port, string username)
+        public static void Connect(string ip, string port, string username, string password)
         {
             if (!int.TryParse(port, out int portNum))
             {
@@ -69,10 +69,19 @@ namespace Samen.Network
                 connection.Connect();
 
                 var packet = new OutgoingPacket(PacketType.Authenticate)
-                    .WriteString(username);
+                    .WriteString(username)
+                    .WriteString(password);
 
                 Connection.GetConnection().Listen(PacketType.Authenticate, (packet) =>
                 {
+
+                    if(!packet.GetBool(0))
+                    {
+                        EditorUtility.DisplayDialog("Connection Failed", "Your credentials where not found.", "Okay.");
+                        Connection.Disconnect();
+                        return;
+                    }
+
                     connectionState = ConnectionState.Connected;
                     EditorUtility.ClearProgressBar();
                 });

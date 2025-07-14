@@ -41,7 +41,6 @@ namespace Samen.Session
             string assetPath = packet.GetString(0);
             GameObject prefabAsset = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
 
-            Debug.Log("Loading prefab from " + assetPath);
 
             if (prefabAsset == null)
             {
@@ -102,8 +101,6 @@ namespace Samen.Session
 
                 netObj.id = ids[i];
             }
-
-            Debug.Log($"Assigned {ids.Length} network IDs to prefab instance '{prefab.name}'");
         }
 
         static void CollectHierarchy(Transform root, List<GameObject> result)
@@ -181,7 +178,10 @@ namespace Samen.Session
 
             SamenNetworkObject destroyedObject = GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None)
                     .Where(obj => obj.id == packet.GetString(0))
-                    .First();
+                    .FirstOrDefault();
+
+            if (destroyedObject == null)
+                return;
 
             for (int i = 0; i < SessionHierarchyWatcher.KnownObjectIds.Length; i++)
             {

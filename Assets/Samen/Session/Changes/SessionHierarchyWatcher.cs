@@ -16,7 +16,6 @@ namespace Assets.Samen.Session.Changes
         public static string[] KnownObjectIds;
         static SessionHierarchyWatcher()
         {
-            Debug.Log("SessionHierarchyWatcher initialized.");
             EditorApplication.hierarchyChanged += OnHierarchyChanged;
         }
 
@@ -106,7 +105,7 @@ namespace Assets.Samen.Session.Changes
         static void DeletedObjectFound(string id)
         {
             Connection.GetConnection().SendPacket(new OutgoingPacket(PacketType.ObjectDestroyed).WriteString(id));
-            Debug.Log($"SamenNetworkObject with Id {id} was destroyed or removed from the scene.");
+            
         }
     }
 }

@@ -181,7 +181,7 @@ namespace Samen.Session
 
             if (timeout)
             {
-                Debug.LogWarning("Communications timed out!");
+                
             }
 
             return (true, response);

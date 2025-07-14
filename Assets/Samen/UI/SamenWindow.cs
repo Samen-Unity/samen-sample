@@ -20,6 +20,7 @@ namespace Samen.UI
         string ipField;
         string portField;
         string usernameField;
+        string passwordField;
 
         private void OnEnable()
         {
@@ -55,13 +56,15 @@ namespace Samen.UI
 
             EditorGUILayout.BeginVertical("box");
             usernameField = EditorGUILayout.TextField(new GUIContent("Username", "Enter your display name"), usernameField);
+            passwordField = EditorGUILayout.TextField(new GUIContent("Password", "Enter your password"), passwordField);
+
             ipField = EditorGUILayout.TextField(new GUIContent("IP Address", "Enter the Samen Host IP"), ipField);
             portField = EditorGUILayout.TextField(new GUIContent("Port", "Enter the connection port"), portField);
             EditorGUILayout.EndVertical();
 
             if (GUILayout.Button("Connect", GUILayout.Height(25)))
             {
-                Connection.Connect(ipField, portField, usernameField);
+                Connection.Connect(ipField, portField, usernameField, passwordField);
             }
         }
 
