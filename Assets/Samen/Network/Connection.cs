@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using Unity.VisualScripting;
@@ -69,9 +70,11 @@ namespace Samen.Network
                 var connection = new Connection(ip, portNum);
                 connection.Connect();
 
+                SHA256 sha256 = SHA256.Create();
+
                 var packet = new OutgoingPacket(PacketType.Authenticate)
                     .WriteString(username)
-                    .WriteString(password);
+                    .WriteString(Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(password)));
 
                 Connection.GetConnection().Listen(PacketType.Authenticate, (packet) =>
                 {
@@ -152,15 +155,21 @@ namespace Samen.Network
         /// <param name="outgoingPacket"></param>
         public void SendPacket(OutgoingPacket outgoingPacket)
         {
-            byte[] data = outgoingPacket.GetBytes();
-            byte[] size = BitConverter.GetBytes(data.Length);
+            try
+            {
+                byte[] data = outgoingPacket.GetBytes();
+                byte[] size = BitConverter.GetBytes(data.Length);
 
-            if (BitConverter.IsLittleEndian)
-                Array.Reverse(size);
+                if (BitConverter.IsLittleEndian)
+                    Array.Reverse(size);
 
 
-            client.GetStream().Write(size, 0, 4);
-            client.GetStream().Write(data, 0, data.Length);
+                client.GetStream().Write(size, 0, 4);
+                client.GetStream().Write(data, 0, data.Length);
+            } catch (Exception ex)
+            {
+                Debug.LogError("Samen did not respond. " + ex);
+            }
         }
 
         private int expected = -1;

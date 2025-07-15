@@ -85,7 +85,7 @@ public class ObjectTransformWatcher
         {
             EditorUtility.DisplayDialog("Connection Lost", "Connection to Samen lost :(", "Close");
 
-            var newScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            var newScene = EditorSceneManager.NewPreviewScene();
         }
     }
 }
