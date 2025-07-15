@@ -74,7 +74,8 @@ namespace Samen.Network
 
                 var packet = new OutgoingPacket(PacketType.Authenticate)
                     .WriteString(username)
-                    .WriteString(Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(password)));
+                    .WriteString(Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(password)))
+                    );
 
                 Connection.GetConnection().Listen(PacketType.Authenticate, (packet) =>
                 {
