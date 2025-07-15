@@ -196,6 +196,11 @@ namespace Samen.Session
                 GameObject.DestroyImmediate(samenNetworkObject);
             }
 
+            foreach(DontUpload dontUpdate in GameObject.FindObjectsByType<DontUpload>(FindObjectsSortMode.None))
+            {
+                GameObject.DestroyImmediate(dontUpdate);
+            }
+
             Scene activeScene = SceneManager.GetActiveScene();
             EditorSceneManager.SaveScene(activeScene);
 

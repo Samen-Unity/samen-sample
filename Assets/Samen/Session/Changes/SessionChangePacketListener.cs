@@ -30,6 +30,7 @@ namespace Samen.Session
             Connection.GetConnection().Listen(PacketType.ChatMessage, OnChatMessagePacket);
             Connection.GetConnection().Listen(PacketType.ParentChange, OnParentChangePacket);
             Connection.GetConnection().Listen(PacketType.PrefabCreated, OnPrefabCreatedPacket);
+            Connection.GetConnection().Listen(PacketType.Ping, Samen.UI.Ping.OnPingPacket);
         }
 
         static void OnPrefabCreatedPacket(IncomingPacket packet)

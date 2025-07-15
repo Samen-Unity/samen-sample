@@ -1,8 +1,11 @@
 using Samen;
 using Samen.Network;
+using Samen.Session;
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 
 // Any object in a session has this
@@ -12,6 +15,12 @@ public class SamenNetworkObject : MonoBehaviour
 
     private void Start()
     {
+        if (!SessionManager.InSessionScene())
+        {
+            EditorUtility.DisplayDialog("Nope!", "You can not add this component to an object.", "OK!");
+            DestroyImmediate(this);
+        }
+
         SamenNetworkObject[] existingObjects = GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None); 
         foreach (SamenNetworkObject samenNetworkObject in existingObjects)
         {
@@ -135,4 +144,31 @@ public class SamenNetworkObject : MonoBehaviour
 
 
 
+}
+
+[CustomEditor(typeof(SamenNetworkObject))]
+public class SamenNetworkObjectInspector : Editor
+{
+    public override VisualElement CreateInspectorGUI()
+    {
+        var root = new VisualElement();
+        root.style.paddingTop = 6;
+        root.style.paddingLeft = 10;
+
+        // Title
+        var title = new Label("Synced with Samen Server.");
+        title.style.unityFontStyleAndWeight = FontStyle.Bold;
+        title.style.marginBottom = 8;
+        title.style.marginTop = 8;
+        title.style.fontSize = 18;
+        root.Add(title);
+
+        var disclaimer = new Label("Please do not remove this component.");
+        disclaimer.style.unityFontStyleAndWeight = FontStyle.Bold;
+        disclaimer.style.marginBottom = 8;
+        disclaimer.style.marginTop = 8;
+        disclaimer.style.fontSize = 14;
+        root.Add(disclaimer);
+        return root;
+    }
 }

@@ -26,7 +26,8 @@ namespace Samen.Network
         ObjectDuplicate,
         ChatMessage,
         ParentChange,
-        PrefabCreated
+        PrefabCreated,
+        Ping
     }
 
     public enum ConnectionState
