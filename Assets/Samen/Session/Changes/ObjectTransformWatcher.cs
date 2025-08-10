@@ -19,6 +19,8 @@ public class ObjectTransformWatcher
     private static SamenNetworkObject lastSelected = null;
     static ObjectTransformWatcher()
     {
+        timeSinceSceneDisconnect = new System.Diagnostics.Stopwatch();
+        timeSinceSceneDisconnect.Start();
         EditorApplication.update += OnEditorTick;
         EditorSceneManager.sceneDirtied += OnSceneDirtied;
     }
@@ -80,13 +82,31 @@ public class ObjectTransformWatcher
         }
     }
 
+
+    private static System.Diagnostics.Stopwatch timeSinceSceneDisconnect;
     public static void UnloadIfDisconnect()
     {
-        if (Connection.GetConnection() == null)
+        if (Connection.GetConnection() == null && timeSinceSceneDisconnect.ElapsedMilliseconds > 100)
         {
+            timeSinceSceneDisconnect.Restart();
             EditorUtility.DisplayDialog("Connection Lost", "Connection to Samen lost :(", "Close");
+            EditorSceneManager.CloseScene(EditorSceneManager.GetActiveScene(), true);
 
-            var newScene = EditorSceneManager.NewPreviewScene();
+            if (SessionManager.CurrentDataPath != null)
+            {
+                Scene scene = EditorSceneManager.OpenScene(SessionManager.CurrentDataPath);
+                Debug.LogWarning("Falling back to local scene.");
+
+                if(scene == null)
+                {
+                    var closeScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+                }
+                return;
+            }
+
+            Debug.LogWarning("Loading backup scene");
+            // In case we cant find the old scene
+            var newScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         }
     }
 }

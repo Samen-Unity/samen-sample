@@ -171,6 +171,7 @@ namespace Samen.Network
             } catch (Exception ex)
             {
                 Debug.LogError("Samen did not respond. " + ex);
+                Disconnect();
             }
         }
 
