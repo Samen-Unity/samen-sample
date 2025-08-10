@@ -1,4 +1,5 @@
-﻿using Assets.Samen.Data;
+﻿#if UNITY_EDITOR
+using Assets.Samen.Data;
 using Samen.Network;
 using Samen.Session;
 using System.Runtime.CompilerServices;
@@ -121,3 +122,4 @@ enum State
     Connected,
     Failed
 }
+#endif

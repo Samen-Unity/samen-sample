@@ -1,4 +1,5 @@
-﻿using Samen.Network;
+﻿#if UNITY_EDITOR
+using Samen.Network;
 using Samen.Session;
 using System;
 using System.Collections.Generic;
@@ -85,3 +86,4 @@ namespace Samen.UI
         }
     }
 }
+#endif

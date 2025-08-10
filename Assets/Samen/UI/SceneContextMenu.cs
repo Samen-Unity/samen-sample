@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using Samen;
 using Samen.Network;
 using Samen.Session;
@@ -92,3 +93,4 @@ public class SceneContextMenu
         SessionManager.JoinSession(selectedAssetPath);
     }
 }
+#endif

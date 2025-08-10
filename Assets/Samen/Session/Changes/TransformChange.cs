@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 
 /// <summary>
@@ -34,3 +35,4 @@ public enum TransformChangeType
     Rotation,
     Scale
 }
+#endif

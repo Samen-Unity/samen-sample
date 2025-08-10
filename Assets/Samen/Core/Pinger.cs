@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Collections;
 using UnityEditor;
 using UnityEngine;
@@ -60,3 +61,4 @@ public class Pinger : MonoBehaviour {
            : (Mathf.Sqrt(1 - Mathf.Pow(-2 * x + 2, 2)) + 1) / 2;
     }
 }
+#endif

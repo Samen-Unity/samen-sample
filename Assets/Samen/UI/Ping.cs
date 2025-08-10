@@ -1,4 +1,5 @@
-﻿using Samen.Network;
+﻿#if UNITY_EDITOR
+using Samen.Network;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -46,3 +47,4 @@ namespace Samen.UI
         }
     }
 }
+#endif

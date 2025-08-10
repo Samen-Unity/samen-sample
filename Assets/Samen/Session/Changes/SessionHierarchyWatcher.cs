@@ -1,4 +1,5 @@
-﻿using Samen.Network;
+﻿#if UNITY_EDITOR
+using Samen.Network;
 using Samen.Session;
 using System;
 using System.Collections.Generic;
@@ -109,3 +110,4 @@ namespace Assets.Samen.Session.Changes
         }
     }
 }
+#endif

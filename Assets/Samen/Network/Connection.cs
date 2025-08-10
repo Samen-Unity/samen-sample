@@ -1,4 +1,4 @@
-
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -97,9 +97,10 @@ namespace Samen.Network
             }
             catch (System.Exception ex)
             {
-                Debug.LogError($"Connection failed: {ex.Message}");
+                Debug.LogError($"Connection failed: {ex.Message}"); 
                 EditorUtility.DisplayDialog("Connection Failed", "Failed to connect to Samen.", "Okay.");
                 EditorUtility.ClearProgressBar();
+                connectionState = ConnectionState.Disconnected;
             }
         }
 
@@ -561,3 +562,4 @@ namespace Samen.Network
         }
     }
 }
+#endif

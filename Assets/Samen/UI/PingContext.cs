@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using Samen.Network;
 using Samen.Session;
 using UnityEditor;
@@ -41,3 +42,4 @@ public class PingContext
         }
     }
 }
+#endif

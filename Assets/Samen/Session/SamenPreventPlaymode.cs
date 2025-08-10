@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using Samen;
 using Samen.Session;
 using UnityEditor;
@@ -28,3 +29,4 @@ public class SamenPreventPlaymode
         }
     }
 }
+#endif
