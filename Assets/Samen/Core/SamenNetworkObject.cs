@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 
@@ -147,11 +148,20 @@ public class SamenNetworkObject : MonoBehaviour
 
 }
 
-[CustomEditor(typeof(SamenNetworkObject))]
+[CustomEditor(typeof(SamenNetworkObject), true)]
+[CanEditMultipleObjects]
 public class SamenNetworkObjectInspector : Editor
 {
+    private const string targetSceneName = "Session"; // Replace with your actual scene name
+
     public override VisualElement CreateInspectorGUI()
     {
+        if (SceneManager.GetActiveScene().name != targetSceneName)
+        {
+            return base.CreateInspectorGUI();
+        }
+
+        // Otherwise, render ONLY the custom UI
         var root = new VisualElement();
         root.style.paddingTop = 6;
         root.style.paddingLeft = 10;
@@ -164,12 +174,14 @@ public class SamenNetworkObjectInspector : Editor
         title.style.fontSize = 18;
         root.Add(title);
 
+        // Warning
         var disclaimer = new Label("Please do not remove this component.");
         disclaimer.style.unityFontStyleAndWeight = FontStyle.Bold;
         disclaimer.style.marginBottom = 8;
         disclaimer.style.marginTop = 8;
         disclaimer.style.fontSize = 14;
         root.Add(disclaimer);
+
         return root;
     }
 }

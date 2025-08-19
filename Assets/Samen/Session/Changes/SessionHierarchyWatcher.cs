@@ -51,53 +51,53 @@ namespace Assets.Samen.Session.Changes
             KnownObjectIds = currentIds.ToArray();
         }
         
-            static void AddPrefab(GameObject gameObject)
+        static void AddPrefab(GameObject gameObject)
+        {
+            GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
+
+            if (prefab == null)
             {
-                GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
-
-                if (prefab == null)
-                {
-                    GameObject.DestroyImmediate(gameObject);
-                    Debug.LogWarning("You can not make objects like that. You can only add prefabs");
-                    return;
-                }
-
-                if (!PrefabUtility.IsAnyPrefabInstanceRoot(gameObject))
-                    return;
-
-                string path = AssetDatabase.GetAssetPath(prefab);
-                List<string> ids = CreateObjectIds(gameObject, new List<string>());
-
-                OutgoingPacket packet = new OutgoingPacket(PacketType.PrefabCreated);
-
-                packet.WriteString(path); // Asset path;
-                packet.WriteInt(ids.Count);
-
-                for(int i = 0; i < ids.Count; i++)
-                {
-                    packet.WriteString(ids[i]);
-                }
-
-                Connection.GetConnection().SendPacket(packet);
+                GameObject.DestroyImmediate(gameObject);
+                EditorUtility.DisplayDialog("Sorry!", "You can not make new objects in a session. You can only add existing prefabs.", "Okay!");
+                return;
             }
 
-            private static List<string> CreateObjectIds(GameObject gameObject, List<string> current)
+            if (!PrefabUtility.IsAnyPrefabInstanceRoot(gameObject))
+                return;
+
+            string path = AssetDatabase.GetAssetPath(prefab);
+            List<string> ids = CreateObjectIds(gameObject, new List<string>());
+
+            OutgoingPacket packet = new OutgoingPacket(PacketType.PrefabCreated);
+
+            packet.WriteString(path); // Asset path;
+            packet.WriteInt(ids.Count);
+
+            for(int i = 0; i < ids.Count; i++)
             {
-                if(gameObject.GetComponent<SamenNetworkObject>() == null)
-                {
-                    SamenNetworkObject networkObject = gameObject.AddComponent<SamenNetworkObject>();
-                    networkObject.Create();
-                    current.Add(networkObject.id);
-                }
-
-                for (int i = 0; i < gameObject.transform.childCount; i++)
-                {
-                    GameObject g = gameObject.transform.GetChild(i).gameObject;
-                    CreateObjectIds(g, current);
-                }
-
-                return current;
+                packet.WriteString(ids[i]);
             }
+
+            Connection.GetConnection().SendPacket(packet);
+        }
+
+        private static List<string> CreateObjectIds(GameObject gameObject, List<string> current)
+        {
+            if(gameObject.GetComponent<SamenNetworkObject>() == null)
+            {
+                SamenNetworkObject networkObject = gameObject.AddComponent<SamenNetworkObject>();
+                networkObject.Create();
+                current.Add(networkObject.id);
+            }
+
+            for (int i = 0; i < gameObject.transform.childCount; i++)
+            {
+                GameObject g = gameObject.transform.GetChild(i).gameObject;
+                CreateObjectIds(g, current);
+            }
+
+            return current;
+        }
 
 
         /// <summary>
