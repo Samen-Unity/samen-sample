@@ -29,7 +29,9 @@ namespace Samen.Network
         ParentChange,
         PrefabCreated,
         Ping,
-        ComponentUpdated
+        ComponentUpdated,
+        CompomentAdded,
+        ComponentRemoved
     }
 
     public enum ConnectionState

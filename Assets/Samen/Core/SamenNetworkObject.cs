@@ -18,6 +18,8 @@ public class SamenNetworkObject : MonoBehaviour
 
     private void Start()
     {
+        previousComponents = new List<Component>(GetComponents<Component>());
+
         if (!SessionManager.InSessionScene())
         {
             EditorUtility.DisplayDialog("Nope!", "You can not add this component to an object.", "OK!");
@@ -44,6 +46,42 @@ public class SamenNetworkObject : MonoBehaviour
 
             }
         }
+    }
+
+    private List<Component> previousComponents = new List<Component>();
+    private void Update()
+    {
+        var currentComponents = new List<Component>(GetComponents<Component>());
+
+        // Loop through all components on this GameObject
+        foreach (var comp in currentComponents)
+        {
+            if (comp == null) continue;
+
+            if (EditorUtility.IsDirty(comp))
+            {
+                ComponentChanged(comp);
+                break;
+            }
+        }
+
+        foreach (var component in currentComponents)
+        {
+            if (!previousComponents.Contains(component))
+            {
+                OnComponentAdded(component);
+            }
+        }
+
+        foreach (var component in previousComponents)
+        {
+            if (!currentComponents.Contains(component))
+            {
+                OnComponentRemoved(component);
+            }
+        }
+
+        previousComponents = currentComponents;
     }
 
     public string id;
@@ -99,6 +137,24 @@ public class SamenNetworkObject : MonoBehaviour
         CacheValues();
     }
 
+    public void OnComponentAdded(Component component)
+    {
+        OutgoingPacket packet = new OutgoingPacket(PacketType.CompomentAdded);
+        packet.WriteString(id);
+        packet.WriteString(component.GetType().FullName);
+
+        Connection.GetConnection().SendPacket(packet);
+    }
+
+    public void OnComponentRemoved(Component component)
+    {
+        OutgoingPacket packet = new OutgoingPacket(PacketType.ComponentRemoved);
+        packet.WriteString(id);
+        packet.WriteString(component.GetType().FullName);
+
+        Connection.GetConnection().SendPacket(packet);
+    }
+
     /// <summary>
     /// Returns a list of any changes if they are required to be send.  
     /// </summary>
@@ -145,21 +201,7 @@ public class SamenNetworkObject : MonoBehaviour
             .WriteString(parentId));
     }
 
-    private void Update()
-    {
-        // Loop through all components on this GameObject
-        foreach (var comp in GetComponents<Component>())
-        {
-            if (comp == null) continue;
 
-            if (EditorUtility.IsDirty(comp))
-            {
-                ComponentChanged(comp);
-                // Optionally break to avoid multiple calls in one frame
-                break;
-            }
-        }
-    }
 
 
     public void ComponentChanged(Component changedComponent)
@@ -197,6 +239,30 @@ public class SamenNetworkObject : MonoBehaviour
 
         EditorJsonUtility.FromJsonOverwrite(json, comp);
         EditorUtility.SetDirty(comp); // Mark dirty so Unity knows it changed
+    }
+
+    public void AddComponent(string type)
+    {
+        Type t = GetTypeByName(type);
+        if (t == null)
+        {
+            Debug.LogError($"Type '{type}' not found!");
+            return;
+        }
+
+        gameObject.AddComponent(t);
+    }
+
+    public void RemoveComponent(string type)
+    {
+        Type t = GetTypeByName(type);
+        if (t == null)
+        {
+            Debug.LogError($"Type '{type}' not found!");
+            return;
+        }
+
+        GameObject.DestroyImmediate(gameObject.GetComponent(t));
     }
 
     public static Type GetTypeByName(string typeName)
