@@ -75,10 +75,16 @@ namespace Samen.Network
 
                 SHA256 sha256 = SHA256.Create();
 
-                var packet = new OutgoingPacket(PacketType.Authenticate)
-                    .WriteString(username)
-                    .WriteString(Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(password)))
-                    );
+                var packet = new OutgoingPacket(PacketType.Authenticate).WriteString(username);
+
+                if (password == null || password.Length == 0)
+                {
+                    Debug.Log("Logging in without a password");
+                    packet.WriteString("None");
+                }
+                else {
+                    packet.WriteString(Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(password))));
+                }
 
                 Connection.GetConnection().Listen(PacketType.Authenticate, (packet) =>
                 {
@@ -89,6 +95,8 @@ namespace Samen.Network
                         Connection.Disconnect();
                         return;
                     }
+
+                    Debug.Log("You are now connected!");
 
                     connectionState = ConnectionState.Connected;
                     EditorUtility.ClearProgressBar();
@@ -103,7 +111,7 @@ namespace Samen.Network
                 Debug.LogError($"Connection failed: {ex.Message}"); 
                 EditorUtility.DisplayDialog("Connection Failed", "Failed to connect to Samen.", "Okay.");
                 EditorUtility.ClearProgressBar();
-                connectionState = ConnectionState.Disconnected;
+                Disconnect();
             }
         }
 
@@ -186,6 +194,10 @@ namespace Samen.Network
         /// <param name="maxRead">The maximum amount of packets to read before stopping.</param>
         public void ReadPackets(int maxRead = 1000)
         {
+            if(!client.Connected)
+            {
+                Disconnect();
+            }
 
             int read = 0;
             while (read < maxRead)
@@ -286,12 +298,16 @@ namespace Samen.Network
         {
             isWaitingForResponse = false;
         }
-        public bool Wait(int timeout = 1000, bool destroy = true)
+        public bool Wait(int timeout = 600, bool destroy = true)
         {
             int timeOut = timeout;
             while (isWaitingForResponse && timeOut > 0)
             {
                 Connection.GetConnection().ReadPackets();
+
+                if (Connection.GetConnection() == null || Connection.connectionState == ConnectionState.Disconnected)
+                    return false;
+
                 timeOut--;
                 Thread.Sleep(10);
 

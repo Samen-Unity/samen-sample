@@ -49,11 +49,17 @@ namespace Samen.Session
             EditorUtility.DisplayProgressBar("Joining Session...", "Downloading session...", 2 / totalSteps);
 
             string sessionData = "";
-            var tempListen = Connection.GetConnection().Listen(PacketType.JoinSession, (packet) =>
+            bool succsess = Connection.GetConnection().Listen(PacketType.JoinSession, (packet) =>
             {
                 sessionData = packet.GetString(0);
-            }).Wait(timeout: 100000);
-
+            }).Wait(timeout: 1000);
+            
+            if(!succsess)
+            {
+                EditorUtility.ClearProgressBar();
+                EditorUtility.DisplayDialog("Woops!", "Failed to download scene file from server.", "Okay");
+                return;
+            }
 
             if (File.Exists(sessionPath))
             {
