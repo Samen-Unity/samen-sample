@@ -23,16 +23,23 @@ namespace Samen.UI
         string usernameField;
         string passwordField;
 
+        bool remember;
+
         private void OnEnable()
         {
             // Load saved values
             ConnectionPrefs.Load();
+
+            ipField = ConnectionPrefs.GetLastIp();
+            portField = ConnectionPrefs.GetLastPort();
+            usernameField = ConnectionPrefs.GetLastUsername();
+            remember  = ConnectionPrefs.GetRemember();
         }
 
         private void OnDisable()
         {
             // Save values when window is closed or Unity closes
-            ConnectionPrefs.Update(ipField, portField, usernameField);
+            ConnectionPrefs.Update(ipField, portField, usernameField, passwordField, remember);
         }
 
         private void OnGUI()
@@ -67,6 +74,8 @@ namespace Samen.UI
             {
                 Connection.Connect(ipField, portField, usernameField, passwordField);
             }
+
+            remember = GUILayout.Toggle(remember, "Automatically Relog");
         }
 
         private void SessionPage()
@@ -111,6 +120,12 @@ namespace Samen.UI
             };
 
             GUILayout.Label("You are connected to Samen.\nJoin a session to start!", style);
+
+            if(GUILayout.Button("Log out"))
+            {
+                ConnectionPrefs.SetRemember(false);
+                Connection.Disconnect();
+            }
         }
     }
 }
