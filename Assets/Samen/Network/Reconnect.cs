@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using Assets.Samen.Data;
 using Samen.Network;
 using UnityEngine;
@@ -13,3 +14,4 @@ public class Reconnect : MonoBehaviour
         }
     }
 }
+#endif
