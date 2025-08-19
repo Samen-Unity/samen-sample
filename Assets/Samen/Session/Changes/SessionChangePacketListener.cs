@@ -32,6 +32,25 @@ namespace Samen.Session
             Connection.GetConnection().Listen(PacketType.ParentChange, OnParentChangePacket);
             Connection.GetConnection().Listen(PacketType.PrefabCreated, OnPrefabCreatedPacket);
             Connection.GetConnection().Listen(PacketType.Ping, UI.Ping.OnPingPacket);
+            Connection.GetConnection().Listen(PacketType.ComponentUpdated, OnComponentUpdated);
+        }
+
+        static void OnComponentUpdated(IncomingPacket packet)
+        {
+            if (!SessionManager.InSessionScene())
+                return;
+
+            string objectId = packet.GetString(0);
+            string component = packet.GetString(1);
+            string json = packet.GetString(2);
+
+            foreach (SamenNetworkObject samenNetworkObject in GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None))
+            {
+                if (samenNetworkObject.id == objectId)
+                {
+                    samenNetworkObject.UpdateComponent(component, json);
+                }
+            }
         }
 
         static void OnPrefabCreatedPacket(IncomingPacket packet)

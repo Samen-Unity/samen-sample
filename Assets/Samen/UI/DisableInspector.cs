@@ -16,6 +16,7 @@ public class DisableInspector : Editor
 
     static DisableInspector()
     {
+        return;
         EditorApplication.update += UpdateInspectorUI;
     }
 

@@ -28,7 +28,8 @@ namespace Samen.Network
         ChatMessage,
         ParentChange,
         PrefabCreated,
-        Ping
+        Ping,
+        ComponentUpdated
     }
 
     public enum ConnectionState

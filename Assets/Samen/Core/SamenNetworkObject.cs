@@ -8,10 +8,11 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using static Unity.Burst.Intrinsics.X86.Avx;
 
 
 // Any object in a session has this
-[ExecuteInEditMode]
+[ExecuteAlways]
 public class SamenNetworkObject : MonoBehaviour
 {
 
@@ -144,8 +145,77 @@ public class SamenNetworkObject : MonoBehaviour
             .WriteString(parentId));
     }
 
+    private void Update()
+    {
+        // Loop through all components on this GameObject
+        foreach (var comp in GetComponents<Component>())
+        {
+            if (comp == null) continue;
+
+            if (EditorUtility.IsDirty(comp))
+            {
+                ComponentChanged(comp);
+                // Optionally break to avoid multiple calls in one frame
+                break;
+            }
+        }
+    }
 
 
+    public void ComponentChanged(Component changedComponent)
+    {
+        EditorUtility.ClearDirty(changedComponent);
+        if (changedComponent.GetType() == typeof(Transform))
+            return;
+
+        if (changedComponent.GetType() == typeof(SamenNetworkObject))
+            return;
+
+        OutgoingPacket packet = new OutgoingPacket(PacketType.ComponentUpdated);
+        packet.WriteString(id);
+        packet.WriteString(changedComponent.GetType().FullName);
+        packet.WriteString(EditorJsonUtility.ToJson(changedComponent));
+
+        Connection.GetConnection().SendPacket(packet);
+    }
+
+    public void UpdateComponent(string type, string json)
+    {
+        Type t = GetTypeByName(type);
+        if (t == null)
+        {
+            Debug.LogError($"Type '{type}' not found!");
+            return;
+        }
+
+        Component comp = GetComponent(t);
+        if (comp == null)
+        {
+            Debug.LogWarning($"Component of type {t} not found on this GameObject.");
+            return;
+        }
+
+        EditorJsonUtility.FromJsonOverwrite(json, comp);
+        EditorUtility.SetDirty(comp); // Mark dirty so Unity knows it changed
+    }
+
+    public static Type GetTypeByName(string typeName)
+    {
+        // Try default first (works for some types)
+        var type = Type.GetType(typeName);
+        if (type != null)
+            return type;
+
+        // Search all loaded assemblies (including UnityEngine.dll)
+        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            type = asm.GetType(typeName);
+            if (type != null)
+                return type;
+        }
+
+        return null;
+    }
 }
 
 [CustomEditor(typeof(SamenNetworkObject), true)]
