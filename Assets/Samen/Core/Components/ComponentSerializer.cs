@@ -57,7 +57,13 @@ public static class ComponentSerializer
                     string permaId = null;
                     string permaType = null;
 
-                    if (reference is GameObject gameObject)
+                    if(reference == null)
+                    {
+                        permaId = "Null";
+                        permaType = "Null";
+                        Debug.LogWarning("Value is null!");
+                    }
+                    else if (reference is GameObject gameObject)
                     {
                         permaId = gameObject.GetComponent<SamenNetworkObject>()?.id;
                         permaType = "GameObject";
@@ -192,10 +198,7 @@ public static class ComponentSerializer
             {
                 var path = iterator.propertyPath;
                 UnityEngine.Object refObj = GetReferenceFromPath(root, path);
-                if (refObj != null)
-                {
-                    iterator.objectReferenceValue = refObj;
-                }
+                iterator.objectReferenceValue = refObj;
             }
         }
 
