@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using Newtonsoft.Json;
 using Samen;
 using Samen.Network;
 using Samen.Session;
@@ -213,33 +214,38 @@ public class SamenNetworkObject : MonoBehaviour
         if (changedComponent.GetType() == typeof(SamenNetworkObject))
             return;
 
+        string json = JsonConvert.SerializeObject(ComponentSerializer.Serialize(changedComponent));
+
         OutgoingPacket packet = new OutgoingPacket(PacketType.ComponentUpdated);
         packet.WriteString(id);
-        packet.WriteString(changedComponent.GetType().FullName);
-        packet.WriteString(EditorJsonUtility.ToJson(changedComponent));
+        packet.WriteString(changedComponent.GetType().AssemblyQualifiedName);
+        packet.WriteString(json);
 
         Connection.GetConnection().SendPacket(packet);
     }
 
-    public void UpdateComponent(string type, string json)
+    public void UpdateComponent(string typeName, string json)
     {
-        Type t = GetTypeByName(type);
-        if (t == null)
+        Type type = Type.GetType(typeName);
+        if (type == null)
         {
-            Debug.LogError($"Type '{type}' not found!");
+            Debug.LogError($"Type '{typeName}' not found!");
             return;
         }
 
-        Component comp = GetComponent(t);
+        Component comp = GetComponent(type);
         if (comp == null)
         {
-            Debug.LogWarning($"Component of type {t} not found on this GameObject.");
+            Debug.LogWarning($"Component of type {type} not found on this GameObject.");
             return;
         }
 
-        EditorJsonUtility.FromJsonOverwrite(json, comp);
-        EditorUtility.SetDirty(comp); // Mark dirty so Unity knows it changed
+        var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+        ComponentSerializer.Apply(comp, data);
+
+        EditorUtility.SetDirty(comp);
     }
+
 
     public void AddComponent(string type)
     {
