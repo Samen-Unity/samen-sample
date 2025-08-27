@@ -15,6 +15,7 @@ public static class ComponentSerializer
     public static string Serialize(Component comp)
     {
         string json = EditorJsonUtility.ToJson(comp, false);
+        Debug.Log("Original: " + json);
         JObject root = JObject.Parse(json);
         FindAndAddSamenReferences(root, comp);
         string newJson = root.ToString(Newtonsoft.Json.Formatting.None);
@@ -31,10 +32,8 @@ public static class ComponentSerializer
             {
                 if (property.Name == "instanceID" && property.Value.Type == JTokenType.Integer)
                 {
-                    // Instead of relying on instanceID value (which is often 0), get the actual reference via reflection:
-                    var fieldName = property.Parent.Path.Split('.').Last(); // Get the field name from the JSON path
+                    var fieldName = property.Parent.Path.Split('.').Last(); 
 
-                    // Try get field first
                     var fieldInfo = comp.GetType().GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                     UnityEngine.Object reference = null;
 
@@ -46,7 +45,6 @@ public static class ComponentSerializer
                     }
                     else
                     {
-                        // Try property if no field found
                         var propInfo = comp.GetType().GetProperty(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                         if (propInfo != null)
                         {
@@ -96,67 +94,60 @@ public static class ComponentSerializer
         if (token.Type == JTokenType.Object)
         {
             var obj = (JObject)token;
-            var properties = obj.Properties().ToList();
 
-            foreach (var property in properties)
+            if (obj.TryGetValue("permaId", out var permaIdToken) &&
+                obj.TryGetValue("permaType", out var permaTypeToken))
             {
-                if (property.Name == "instanceID" && property.Value.Type == JTokenType.Object)
+                string id = permaIdToken.ToString();
+                string typeStr = permaTypeToken.ToString();
+                int instanceId = -1;
+
+                var owner = GetOwnerFromSamenId(id);
+
+                if (owner == null)
                 {
-                    var instanceObj = (JObject)property.Value;
-                    var permaIdToken = instanceObj["permaId"];
-                    var permaTypeToken = instanceObj["permaType"];
-
-                    if (permaIdToken == null || permaTypeToken == null)
-                    {
-                        continue;
-                    }
-
-                    string typeStr = permaTypeToken.ToString();
-                    string id = permaIdToken.ToString();
-
-                    int instanceId = -1;
-
-                    var owner = GetOwnerFromSamenId(id);
-
-                    if (owner == null)
-                    {
-                        Debug.LogWarning($"No GameObject found for SamenID '{id}'");
-                    }
-                    else if (typeStr == "GameObject")
-                    {
-                        instanceId = owner.GetInstanceID();
-                    }
-                    else
-                    {
-                        Type compType = Type.GetType(typeStr);
-                        if (compType == null)
-                        {
-                            Debug.LogWarning($"Type '{typeStr}' not found.");
-                        }
-                        else
-                        {
-                            var component = owner.GetComponent(compType);
-                            if (component == null)
-                            {
-                                Debug.LogWarning($"Component '{typeStr}' not found on GameObject '{owner.name}'.");
-                            }
-                            else
-                            {
-                                instanceId = component.GetInstanceID();
-                            }
-                        }
-                    }
-
-                    property.Parent.Replace(new JObject
-                    {
-                        ["instanceID"] = instanceId
-                    });
-
+                    Debug.LogWarning($"No GameObject found for SamenID '{id}'");
+                }
+                else if (typeStr == "GameObject")
+                {
+                    instanceId = owner.GetInstanceID();
                 }
                 else
                 {
-                    FindAndRemoveSamenReferences(property.Value);
+                    Type compType = Type.GetType(typeStr);
+                    if (compType == null)
+                    {
+                        Debug.LogWarning($"Type '{typeStr}' not found.");
+                    }
+                    else
+                    {
+                        var component = owner.GetComponent(compType);
+                        if (component == null)
+                        {
+                            Debug.LogWarning($"Component '{typeStr}' not found on GameObject '{owner.name}'");
+                        }
+                        else
+                        {
+                            instanceId = component.GetInstanceID();
+                        }
+                    }
                 }
+
+                var parentProp = obj.Parent as JProperty;
+                if (parentProp != null)
+                {
+                    parentProp.Value = new JObject
+                    {
+                        ["instanceID"] = instanceId
+                    };
+                }
+
+                return;
+            }
+
+            foreach (var property in obj.Properties().ToList())
+            {
+                FindAndRemoveSamenReferences(property.Value);
             }
         }
         else if (token.Type == JTokenType.Array)
@@ -187,11 +178,101 @@ public static class ComponentSerializer
     {
         JObject root = JObject.Parse(json);
 
-        FindAndRemoveSamenReferences(root);
-
-        string fixedJson = root.ToString(Newtonsoft.Json.Formatting.None);
+        JObject cleaned = (JObject)root.DeepClone();
+        RemoveObjRef(cleaned);
+        string fixedJson = cleaned.ToString(Newtonsoft.Json.Formatting.None);
         EditorJsonUtility.FromJsonOverwrite(fixedJson, target);
+
+        var so = new SerializedObject(target);
+        var iterator = so.GetIterator();
+
+        while (iterator.NextVisible(true))
+        {
+            if (iterator.propertyType == SerializedPropertyType.ObjectReference && iterator.name != "m_Script")
+            {
+                var path = iterator.propertyPath;
+                UnityEngine.Object refObj = GetReferenceFromPath(root, path);
+                if (refObj != null)
+                {
+                    iterator.objectReferenceValue = refObj;
+                }
+            }
+        }
+
+        so.ApplyModifiedProperties();
+        EditorUtility.SetDirty(target);
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(target.gameObject.scene);
     }
+
+    private static UnityEngine.Object GetReferenceFromPath(JToken root, string propertyPath)
+    {
+        var tokens = propertyPath.Split('.');
+        JToken current = root["MonoBehaviour"];
+
+        foreach (var token in tokens)
+        {
+            if (current == null) return null;
+
+            current = current[token];
+        }
+
+        if (current is JObject refObj &&
+            refObj.TryGetValue("permaId", out var permaIdToken) &&
+            refObj.TryGetValue("permaType", out var permaTypeToken))
+        {
+            string permaId = permaIdToken.ToString();
+            string permaType = permaTypeToken.ToString();
+
+            var owner = GetOwnerFromSamenId(permaId);
+            if (owner == null) return null;
+
+            if (permaType == "GameObject") return owner.gameObject;
+
+            var type = Type.GetType(permaType);
+            if (type == null) return null;
+
+            return owner.GetComponent(type);
+        }
+
+        return null;
+    }
+
+
+    private static void RemoveObjRef(JToken token)
+    {
+        if (token.Type == JTokenType.Object)
+        {
+            var obj = (JObject)token;
+            var keysToRemove = new List<string>();
+
+            foreach (var property in obj.Properties().ToList())
+            {
+                if (property.Value.Type == JTokenType.Object)
+                {
+                    var valObj = (JObject)property.Value;
+                    if (valObj.ContainsKey("permaId") && valObj.ContainsKey("permaType"))
+                    {
+                        keysToRemove.Add(property.Name);
+                        continue;
+                    }
+                }
+                RemoveObjRef(property.Value);
+            }
+
+            foreach (var key in keysToRemove)
+            {
+                obj.Remove(key);
+            }
+        }
+        else if (token.Type == JTokenType.Array)
+        {
+            foreach (var item in token.Children())
+            {
+                RemoveObjRef(item);
+            }
+        }
+    }
+
 
 }
 
