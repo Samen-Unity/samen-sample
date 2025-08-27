@@ -1,8 +1,8 @@
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UnityEditor;
 using UnityEngine;
 
 public class ComponentSerializer
@@ -112,3 +112,4 @@ public class ReferenceInfo
         this.componentType = componentType;
     }
 }
+#endif
