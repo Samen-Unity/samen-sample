@@ -18,7 +18,7 @@ public static class ComponentSerializer
         JObject root = JObject.Parse(json);
         FindAndAddSamenReferences(root, comp);
         string newJson = root.ToString(Newtonsoft.Json.Formatting.None);
-        Debug.Log(newJson);
+
         return newJson;
     }
 
@@ -147,7 +147,11 @@ public static class ComponentSerializer
                         }
                     }
 
-                    property.Value = new JValue(instanceId);
+                    property.Parent.Replace(new JObject
+                    {
+                        ["instanceID"] = instanceId
+                    });
+
                 }
                 else
                 {
