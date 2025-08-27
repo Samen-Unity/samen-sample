@@ -15,7 +15,7 @@ public static class ComponentSerializer
     public static string Serialize(Component comp)
     {
         string json = EditorJsonUtility.ToJson(comp, false);
-        Debug.Log("Original: " + json);
+       
         JObject root = JObject.Parse(json);
         FindAndAddSamenReferences(root, comp);
         string newJson = root.ToString(Newtonsoft.Json.Formatting.None);
