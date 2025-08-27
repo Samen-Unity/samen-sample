@@ -4,50 +4,53 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEditor;
+using Newtonsoft.Json.Linq;
 
-public class ComponentSerializer
+public static class ComponentSerializer
 {
     public static Dictionary<string, object> Serialize(Component comp)
     {
-
+        string json = EditorJsonUtility.ToJson(comp, true);
+        JObject parsed = JObject.Parse(json);
         var result = new Dictionary<string, object>();
-        var fields = comp.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-        foreach (var field in fields)
+        foreach (var prop in parsed.Properties())
         {
-            var value = field.GetValue(comp);
+            string name = prop.Name;
+            JToken value = prop.Value;
 
-            if (value is UnityEngine.Object unityObj)
+            var field = comp.GetType().GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (field != null && typeof(UnityEngine.Object).IsAssignableFrom(field.FieldType))
             {
-                GameObject go = null;
+                UnityEngine.Object objRef = field.GetValue(comp) as UnityEngine.Object;
 
-                if (unityObj is GameObject gameObj)
-                    go = gameObj;
-                else if (unityObj is Component compt)
-                    go = compt.gameObject;
-                SamenNetworkObject compB = go?.GetComponent<SamenNetworkObject>();
-
-                if(compB == null)
+                if (objRef == null)
                 {
-                    Debug.LogError("You can only serialize components with a SamenNetworkObject attached.");
+                    result[name] = null;
+                    continue;
+                }
+
+                GameObject go = objRef switch
+                {
+                    GameObject goRef => goRef,
+                    Component compRef => compRef.gameObject,
+                    _ => null
+                };
+
+                var netObj = go?.GetComponent<SamenNetworkObject>();
+                if (netObj == null)
+                {
+                    Debug.LogError($"Cannot serialize '{name}'. No SamenNetworkObject on {go?.name}!");
                     return null;
                 }
 
-                var id = compB.id;
-                if (id != null)
-                {
-                    var refInfo = new ReferenceInfo(id, value.GetType().AssemblyQualifiedName);
-                      
-                    result[field.Name] = refInfo;
-                }
-                else
-                {
-                    result[field.Name] = null;
-                }
+                var refInfo = new ReferenceInfo(netObj.id, objRef.GetType().AssemblyQualifiedName);
+                result[name] = refInfo;
             }
             else
             {
-                result[field.Name] = value;
+                result[name] = value.ToObject<object>();
             }
         }
 
@@ -63,7 +66,7 @@ public class ComponentSerializer
         {
             if (!data.TryGetValue(field.Name, out var value)) continue;
 
-            if (value is Newtonsoft.Json.Linq.JObject jObj && jObj["ID"] != null)
+            if (value is JObject jObj && jObj["ID"] != null)
             {
                 var refInfo = jObj.ToObject<ReferenceInfo>();
                 var go = GetWithId(refInfo.ID);
@@ -87,12 +90,18 @@ public class ComponentSerializer
             }
             else
             {
-                object converted = Convert.ChangeType(value, field.FieldType);
-                field.SetValue(target, converted);
+                try
+                {
+                    object converted = Convert.ChangeType(value, field.FieldType);
+                    field.SetValue(target, converted);
+                }
+                catch
+                {
+                    Debug.LogWarning($"Failed to set field {field.Name} on {target.name}");
+                }
             }
         }
     }
-
 
     private static GameObject GetWithId(string id)
     {
@@ -100,6 +109,7 @@ public class ComponentSerializer
             .FirstOrDefault(o => o.id == id)?.gameObject;
     }
 }
+
 [Serializable]
 public class ReferenceInfo
 {
