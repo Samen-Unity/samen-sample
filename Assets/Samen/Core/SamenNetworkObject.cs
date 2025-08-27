@@ -241,8 +241,7 @@ public class SamenNetworkObject : MonoBehaviour
         }
 
         ComponentSerializer.Apply(comp, json);
-
-        EditorUtility.SetDirty(comp);
+        EditorUtility.ClearDirty(comp);
     }
 
 
