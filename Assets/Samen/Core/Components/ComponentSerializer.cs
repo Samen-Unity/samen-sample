@@ -8,6 +8,7 @@ using Unity.VisualScripting.Antlr3.Runtime;
 using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEditor;
 using UnityEngine;
+using static Unity.Burst.Intrinsics.X86.Avx;
 
 public static class ComponentSerializer
 {
@@ -15,12 +16,13 @@ public static class ComponentSerializer
     {
         string json = EditorJsonUtility.ToJson(comp, false);
         JObject root = JObject.Parse(json);
-        FindAndAddSamenReferences(root);
+        FindAndAddSamenReferences(root, comp);
         string newJson = root.ToString(Newtonsoft.Json.Formatting.None);
+        Debug.Log(newJson);
         return newJson;
     }
 
-    private static void FindAndAddSamenReferences(JToken token)
+    private static void FindAndAddSamenReferences(JToken token, Component comp)
     {
         if (token.Type == JTokenType.Object)
         {
@@ -29,32 +31,54 @@ public static class ComponentSerializer
             {
                 if (property.Name == "instanceID" && property.Value.Type == JTokenType.Integer)
                 {
-                    int oldValue = (int)property.Value;
+                    // Instead of relying on instanceID value (which is often 0), get the actual reference via reflection:
+                    var fieldName = property.Parent.Path.Split('.').Last(); // Get the field name from the JSON path
 
-                    UnityEngine.Object reference = EditorUtility.InstanceIDToObject(oldValue);
+                    // Try get field first
+                    var fieldInfo = comp.GetType().GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    UnityEngine.Object reference = null;
+
+                    if (fieldInfo != null)
+                    {
+                        var value = fieldInfo.GetValue(comp);
+                        if (value is UnityEngine.Object unityObj)
+                            reference = unityObj;
+                    }
+                    else
+                    {
+                        // Try property if no field found
+                        var propInfo = comp.GetType().GetProperty(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                        if (propInfo != null)
+                        {
+                            var value = propInfo.GetValue(comp);
+                            if (value is UnityEngine.Object unityObj)
+                                reference = unityObj;
+                        }
+                    }
 
                     string permaId = null;
                     string permaType = null;
+
                     if (reference is GameObject gameObject)
                     {
-                        permaId = gameObject.GetComponent<SamenNetworkObject>().id;
+                        permaId = gameObject.GetComponent<SamenNetworkObject>()?.id;
                         permaType = "GameObject";
                     }
                     else if (reference is Component component)
                     {
-                        permaId = component.gameObject.GetComponent<SamenNetworkObject>().id;
+                        permaId = component.gameObject.GetComponent<SamenNetworkObject>()?.id;
                         permaType = component.GetType().AssemblyQualifiedName;
                     }
 
                     property.Parent.Replace(new JObject
                     {
                         ["permaId"] = permaId ?? "(missing SamenNetworkObject)",
-                        ["permaType"] = permaType ?? reference.GetType().Name
+                        ["permaType"] = permaType ?? (reference != null ? reference.GetType().Name : "null")
                     });
                 }
                 else
                 {
-                    FindAndAddSamenReferences(property.Value);
+                    FindAndAddSamenReferences(property.Value, comp);
                 }
             }
         }
@@ -62,7 +86,7 @@ public static class ComponentSerializer
         {
             foreach (var item in token.Children())
             {
-                FindAndAddSamenReferences(item);
+                FindAndAddSamenReferences(item, comp);
             }
         }
     }
