@@ -61,7 +61,6 @@ public static class ComponentSerializer
                     {
                         permaId = "Null";
                         permaType = "Null";
-                        Debug.LogWarning("Value is null!");
                     }
                     else if (reference is GameObject gameObject)
                     {
