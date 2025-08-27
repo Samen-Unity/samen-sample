@@ -1,113 +1,170 @@
 #if UNITY_EDITOR
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UnityEngine;
+using Unity.VisualScripting.Antlr3.Runtime;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEditor;
-using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 public static class ComponentSerializer
 {
-    public static Dictionary<string, object> Serialize(Component comp)
+    public static string Serialize(Component comp)
     {
-        string json = EditorJsonUtility.ToJson(comp, true);
-        JObject parsed = JObject.Parse(json);
-        var result = new Dictionary<string, object>();
-
-        foreach (var prop in parsed.Properties())
-        {
-            string name = prop.Name;
-            JToken value = prop.Value;
-
-            var field = comp.GetType().GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            if (field != null && typeof(UnityEngine.Object).IsAssignableFrom(field.FieldType))
-            {
-                UnityEngine.Object objRef = field.GetValue(comp) as UnityEngine.Object;
-
-                if (objRef == null)
-                {
-                    result[name] = null;
-                    continue;
-                }
-
-                GameObject go = objRef switch
-                {
-                    GameObject goRef => goRef,
-                    Component compRef => compRef.gameObject,
-                    _ => null
-                };
-
-                var netObj = go?.GetComponent<SamenNetworkObject>();
-                if (netObj == null)
-                {
-                    Debug.LogError($"Cannot serialize '{name}'. No SamenNetworkObject on {go?.name}!");
-                    return null;
-                }
-
-                var refInfo = new ReferenceInfo(netObj.id, objRef.GetType().AssemblyQualifiedName);
-                result[name] = refInfo;
-            }
-            else
-            {
-                result[name] = value.ToObject<object>();
-            }
-        }
-
-        return result;
+        string json = EditorJsonUtility.ToJson(comp, false);
+        JObject root = JObject.Parse(json);
+        FindAndAddSamenReferences(root);
+        string newJson = root.ToString(Newtonsoft.Json.Formatting.None);
+        return newJson;
     }
 
-    public static void Apply(Component target, Dictionary<string, object> data)
+    private static void FindAndAddSamenReferences(JToken token)
     {
-        var type = target.GetType();
-        var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-        foreach (var field in fields)
+        if (token.Type == JTokenType.Object)
         {
-            if (!data.TryGetValue(field.Name, out var value)) continue;
-
-            if (value is JObject jObj && jObj["ID"] != null)
+            var obj = (JObject)token;
+            foreach (var property in obj.Properties())
             {
-                var refInfo = jObj.ToObject<ReferenceInfo>();
-                var go = GetWithId(refInfo.ID);
-
-                if (go != null)
+                if (property.Name == "instanceID" && property.Value.Type == JTokenType.Integer)
                 {
-                    UnityEngine.Object refValue = null;
+                    int oldValue = (int)property.Value;
 
-                    if (refInfo.componentType == typeof(GameObject).AssemblyQualifiedName)
-                        refValue = go;
-                    else
+                    UnityEngine.Object reference = EditorUtility.InstanceIDToObject(oldValue);
+
+                    string permaId = null;
+                    string permaType = null;
+                    if (reference is GameObject gameObject)
                     {
-                        var t = Type.GetType(refInfo.componentType);
-                        if (t != null)
-                            refValue = go.GetComponent(t);
+                        permaId = gameObject.GetComponent<SamenNetworkObject>().id;
+                        permaType = "GameObject";
+                    }
+                    else if (reference is Component component)
+                    {
+                        permaId = component.gameObject.GetComponent<SamenNetworkObject>().id;
+                        permaType = component.GetType().AssemblyQualifiedName;
                     }
 
-                    if (refValue != null)
-                        field.SetValue(target, refValue);
+                    property.Parent.Replace(new JObject
+                    {
+                        ["permaId"] = permaId ?? "(missing SamenNetworkObject)",
+                        ["permaType"] = permaType ?? reference.GetType().Name
+                    });
+                }
+                else
+                {
+                    FindAndAddSamenReferences(property.Value);
                 }
             }
-            else
+        }
+        else if (token.Type == JTokenType.Array)
+        {
+            foreach (var item in token.Children())
             {
-                try
-                {
-                    object converted = Convert.ChangeType(value, field.FieldType);
-                    field.SetValue(target, converted);
-                }
-                catch
-                {
-                    Debug.LogWarning($"Failed to set field {field.Name} on {target.name}");
-                }
+                FindAndAddSamenReferences(item);
             }
         }
     }
 
-    private static GameObject GetWithId(string id)
+    public static void FindAndRemoveSamenReferences(JToken token)
     {
-        return GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None)
-            .FirstOrDefault(o => o.id == id)?.gameObject;
+        if (token.Type == JTokenType.Object)
+        {
+            var obj = (JObject)token;
+            var properties = obj.Properties().ToList();
+
+            foreach (var property in properties)
+            {
+                if (property.Name == "instanceID" && property.Value.Type == JTokenType.Object)
+                {
+                    var instanceObj = (JObject)property.Value;
+                    var permaIdToken = instanceObj["permaId"];
+                    var permaTypeToken = instanceObj["permaType"];
+
+                    if (permaIdToken == null || permaTypeToken == null)
+                    {
+                        continue;
+                    }
+
+                    string typeStr = permaTypeToken.ToString();
+                    string id = permaIdToken.ToString();
+
+                    int instanceId = -1;
+
+                    var owner = GetOwnerFromSamenId(id);
+
+                    if (owner == null)
+                    {
+                        Debug.LogWarning($"No GameObject found for SamenID '{id}'");
+                    }
+                    else if (typeStr == "GameObject")
+                    {
+                        instanceId = owner.GetInstanceID();
+                    }
+                    else
+                    {
+                        Type compType = Type.GetType(typeStr);
+                        if (compType == null)
+                        {
+                            Debug.LogWarning($"Type '{typeStr}' not found.");
+                        }
+                        else
+                        {
+                            var component = owner.GetComponent(compType);
+                            if (component == null)
+                            {
+                                Debug.LogWarning($"Component '{typeStr}' not found on GameObject '{owner.name}'.");
+                            }
+                            else
+                            {
+                                instanceId = component.GetInstanceID();
+                            }
+                        }
+                    }
+
+                    property.Value = new JValue(instanceId);
+                }
+                else
+                {
+                    FindAndRemoveSamenReferences(property.Value);
+                }
+            }
+        }
+        else if (token.Type == JTokenType.Array)
+        {
+            foreach (var item in token.Children())
+            {
+                FindAndRemoveSamenReferences(item);
+            }
+        }
     }
+
+
+    public static SamenNetworkObject GetOwnerFromSamenId(string samenId)
+    {
+        var allNetworkObjects = GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None);
+
+        foreach (var networkObject in allNetworkObjects)
+        {
+            if (networkObject.id == samenId)
+            {
+                return networkObject;
+            }
+        }
+
+        return null;
+    }
+    public static void Apply(Component target, string json)
+    {
+        JObject root = JObject.Parse(json);
+
+        FindAndRemoveSamenReferences(root);
+
+        string fixedJson = root.ToString(Newtonsoft.Json.Formatting.None);
+        EditorJsonUtility.FromJsonOverwrite(fixedJson, target);
+    }
+
 }
 
 [Serializable]

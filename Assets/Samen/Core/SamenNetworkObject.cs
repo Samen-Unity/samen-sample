@@ -214,7 +214,7 @@ public class SamenNetworkObject : MonoBehaviour
         if (changedComponent.GetType() == typeof(SamenNetworkObject))
             return;
 
-        string json = JsonConvert.SerializeObject(ComponentSerializer.Serialize(changedComponent));
+        string json = ComponentSerializer.Serialize(changedComponent);
 
         OutgoingPacket packet = new OutgoingPacket(PacketType.ComponentUpdated);
         packet.WriteString(id);
@@ -240,8 +240,7 @@ public class SamenNetworkObject : MonoBehaviour
             return;
         }
 
-        var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-        ComponentSerializer.Apply(comp, data);
+        ComponentSerializer.Apply(comp, json);
 
         EditorUtility.SetDirty(comp);
     }
