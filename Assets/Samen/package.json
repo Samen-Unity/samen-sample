@@ -1,0 +1,10 @@
+{
+  "name": "com.yourname.yourpackage",
+  "version": "1.0.0",
+  "displayName": "Your Package",
+  "description": "A package that synchronizes Unity components.",
+  "unity": "2021.2",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.0.2"
+  }
+}
