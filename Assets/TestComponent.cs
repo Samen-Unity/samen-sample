@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class TestComponent : MonoBehaviour
 {
-    public GameObject reference;
+    public Rigidbody reference;
     public string text;
     public int number;
     public float value;
