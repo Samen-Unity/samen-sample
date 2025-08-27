@@ -103,11 +103,12 @@ public class ComponentSerializer
 [Serializable]
 public class ReferenceInfo
 {
-    public string ID;
-    public string componentType;
+    public string ID { get; set; }
+    public string componentType { get; set; }
 
     public ReferenceInfo(string id, string componentType)
     {
-        this.ID = id;  
+        ID = id;
+        this.componentType = componentType;
     }
 }
