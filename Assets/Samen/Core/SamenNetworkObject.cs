@@ -250,7 +250,8 @@ public class SamenNetworkObject : MonoBehaviour
             return;
         }
 
-        gameObject.AddComponent(t);
+        Component c = gameObject.AddComponent(t);
+        previousComponents.Add(c);
     }
 
     public void RemoveComponent(string type)
