@@ -65,7 +65,19 @@ public class DisableInspector : Editor
 
             if (SessionManager.InSessionScene())
             {
-                root.Add(bigSquare);
+                if (!root.Contains(bigSquare))
+                {
+                    Debug.Log("[Samen] Locking Inspector.");
+                    root.Add(bigSquare);
+                }
+            }
+            else
+            {
+                if (root.Contains(bigSquare))
+                {
+                    Debug.Log("[Samen] Unlocking Inspector.");
+                    root.Remove(bigSquare);
+                }
             }
         }
     }

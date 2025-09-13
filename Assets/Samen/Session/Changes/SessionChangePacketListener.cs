@@ -46,7 +46,7 @@ namespace Samen.Session
 
             if (prefabAsset == null)
             {
-                Debug.LogError($"Failed to load prefab at path: {assetPath}");
+                Debug.LogError($"[Samen] Failed to load prefab at path: {assetPath}");
                 return;
             }
 
@@ -55,7 +55,7 @@ namespace Samen.Session
 
             if (instance == null)
             {
-                Debug.LogError("Failed to instantiate prefab.");
+                Debug.LogError("[Samen] Failed to instantiate prefab.");
                 return;
             }
 

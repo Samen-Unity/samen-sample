@@ -60,13 +60,13 @@ namespace Samen.Network
         {
             if (!int.TryParse(port, out int portNum))
             {
-                Debug.LogError("Port must be a valid number");
-                EditorUtility.DisplayDialog("Connection Failed", "You must enter a valid port.", "Okay.");
+                Debug.LogError($"[Samen] Port must be a valid number! Current: \"{port}\".");
+                EditorUtility.DisplayDialog("Connection Failed", "You must enter a valid port!", "Okay.");
 
                 return;
             }
 
-            EditorUtility.DisplayProgressBar("Connecting", "Connecting with samen", 0.5f);
+            EditorUtility.DisplayProgressBar("Connecting", "Connecting with samen...", 0.5f);
             connectionState = ConnectionState.Connecting;
             try
             {
@@ -79,10 +79,11 @@ namespace Samen.Network
 
                 if (password == null || password.Length == 0)
                 {
-                    Debug.Log("Logging in without a password");
+                    Debug.Log("[Samen] Logging in without a password...");
                     packet.WriteString("None");
                 }
                 else {
+                    Debug.Log("[Samen] Logging in...");
                     packet.WriteString(Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(password))));
                 }
 
@@ -96,7 +97,7 @@ namespace Samen.Network
                         return;
                     }
 
-                    Debug.Log("You are now connected!");
+                    Debug.Log("[Samen] You are now connected!");
 
                     connectionState = ConnectionState.Connected;
                     EditorUtility.ClearProgressBar();
