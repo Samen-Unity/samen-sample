@@ -33,63 +33,7 @@ namespace Samen.Session
             Connection.GetConnection().Listen(PacketType.ParentChange, OnParentChangePacket);
             Connection.GetConnection().Listen(PacketType.PrefabCreated, OnPrefabCreatedPacket);
             Connection.GetConnection().Listen(PacketType.Ping, UI.Ping.OnPingPacket);
-            Connection.GetConnection().Listen(PacketType.ComponentUpdated, OnComponentUpdated);
-            Connection.GetConnection().Listen(PacketType.ComponentRemoved, OnComponentRemoved);
-            Connection.GetConnection().Listen(PacketType.CompomentAdded, OnComponentAdded);
         }
-
-        static void OnComponentAdded(IncomingPacket packet)
-        {
-            if (!SessionManager.InSessionScene())
-                return;
-
-            string objectId = packet.GetString(0);
-            string component = packet.GetString(1);
-
-            foreach (SamenNetworkObject samenNetworkObject in GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None))
-            {
-                if (samenNetworkObject.id == objectId)
-                {
-                    samenNetworkObject.AddComponent(component);
-                }
-            }
-        }
-
-        static void OnComponentRemoved(IncomingPacket packet)
-        {
-            if (!SessionManager.InSessionScene())
-                return;
-
-            string objectId = packet.GetString(0);
-            string component = packet.GetString(1);
-
-            foreach (SamenNetworkObject samenNetworkObject in GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None))
-            {
-                if (samenNetworkObject.id == objectId)
-                {
-                    samenNetworkObject.RemoveComponent(component);
-                }
-            }
-        }
-
-        static void OnComponentUpdated(IncomingPacket packet)
-        {
-            if (!SessionManager.InSessionScene())
-                return;
-
-            string objectId = packet.GetString(0);
-            string component = packet.GetString(1);
-            string json = packet.GetString(2);
-
-            foreach (SamenNetworkObject samenNetworkObject in GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None))
-            {
-                if (samenNetworkObject.id == objectId)
-                {
-                    samenNetworkObject.UpdateComponent(component, json);
-                }
-            }
-        }
-
         static void OnPrefabCreatedPacket(IncomingPacket packet)
         {
             if (!SessionManager.InSessionScene())

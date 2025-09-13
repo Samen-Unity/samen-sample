@@ -19,8 +19,6 @@ public class SamenNetworkObject : MonoBehaviour
 
     private void Start()
     {
-        previousComponents = new List<Component>(GetComponents<Component>());
-
         if (!SessionManager.InSessionScene())
         {
             EditorUtility.DisplayDialog("Nope!", "You can not add this component to an object.", "OK!");
@@ -47,42 +45,6 @@ public class SamenNetworkObject : MonoBehaviour
 
             }
         }
-    }
-
-    private List<Component> previousComponents = new List<Component>();
-    private void Update()
-    {
-        var currentComponents = new List<Component>(GetComponents<Component>());
-
-        // Loop through all components on this GameObject
-        foreach (var comp in currentComponents)
-        {
-            if (comp == null) continue;
-
-            if (EditorUtility.IsDirty(comp))
-            {
-                ComponentChanged(comp);
-                break;
-            }
-        }
-
-        foreach (var component in currentComponents)
-        {
-            if (!previousComponents.Contains(component))
-            {
-                OnComponentAdded(component);
-            }
-        }
-
-        foreach (var component in previousComponents)
-        {
-            if (!currentComponents.Contains(component))
-            {
-                OnComponentRemoved(component);
-            }
-        }
-
-        previousComponents = currentComponents;
     }
 
     public string id;
@@ -200,74 +162,6 @@ public class SamenNetworkObject : MonoBehaviour
         Connection.GetConnection().SendPacket(new OutgoingPacket(PacketType.ParentChange)
             .WriteString(id)
             .WriteString(parentId));
-    }
-
-
-
-
-    public void ComponentChanged(Component changedComponent)
-    {
-        EditorUtility.ClearDirty(changedComponent);
-        if (changedComponent.GetType() == typeof(Transform))
-            return;
-
-        if (changedComponent.GetType() == typeof(SamenNetworkObject))
-            return;
-
-        string json = ComponentSerializer.Serialize(changedComponent);
-
-        OutgoingPacket packet = new OutgoingPacket(PacketType.ComponentUpdated);
-        packet.WriteString(id);
-        packet.WriteString(changedComponent.GetType().AssemblyQualifiedName);
-        packet.WriteString(json);
-
-        Connection.GetConnection().SendPacket(packet);
-    }
-
-    public void UpdateComponent(string typeName, string json)
-    {
-        Type type = Type.GetType(typeName);
-        if (type == null)
-        {
-            Debug.LogError($"Type '{typeName}' not found!");
-            return;
-        }
-
-        Component comp = GetComponent(type);
-        if (comp == null)
-        {
-            Debug.LogWarning($"Component of type {type} not found on this GameObject.");
-            return;
-        }
-
-        ComponentSerializer.Apply(comp, json);
-        EditorUtility.ClearDirty(comp);
-    }
-
-
-    public void AddComponent(string type)
-    {
-        Type t = GetTypeByName(type);
-        if (t == null)
-        {
-            Debug.LogError($"Type '{type}' not found!");
-            return;
-        }
-
-        Component c = gameObject.AddComponent(t);
-        previousComponents.Add(c);
-    }
-
-    public void RemoveComponent(string type)
-    {
-        Type t = GetTypeByName(type);
-        if (t == null)
-        {
-            Debug.LogError($"Type '{type}' not found!");
-            return;
-        }
-
-        GameObject.DestroyImmediate(gameObject.GetComponent(t));
     }
 
     public static Type GetTypeByName(string typeName)

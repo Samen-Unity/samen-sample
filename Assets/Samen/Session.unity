@@ -205,10 +205,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 6563927843861906501, guid: 53b0c952f3b132245ad747f09aa13cb0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 320790116}
-    - targetCorrespondingSourceObject: {fileID: 6563927843861906501, guid: 53b0c952f3b132245ad747f09aa13cb0, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 320790117}
+      addedObject: {fileID: 1681783420}
     - targetCorrespondingSourceObject: {fileID: 4398587914179103300, guid: 53b0c952f3b132245ad747f09aa13cb0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 264559604}
@@ -226,7 +223,7 @@ PrefabInstance:
       addedObject: {fileID: 264559600}
     - targetCorrespondingSourceObject: {fileID: 1151399279189532306, guid: 53b0c952f3b132245ad747f09aa13cb0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1208009080}
+      addedObject: {fileID: 995000020}
   m_SourcePrefab: {fileID: 100100000, guid: 53b0c952f3b132245ad747f09aa13cb0, type: 3}
 --- !u!1 &264559593 stripped
 GameObject:
@@ -274,8 +271,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  id: feb3a998-e4d6-4a0c-8b69-bd97b0364746
+  m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
+  id: 92528e76-08b8-41e5-8b8d-415b941da43f
 --- !u!114 &264559601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -287,8 +284,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  id: 46d3e674-7292-4680-b6dc-032a50a277d6
+  m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
+  id: 6b1af94d-c4be-459b-918c-b458e6e6b863
 --- !u!114 &264559602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -300,8 +297,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  id: 6b5c16e0-c1c1-456a-a50d-e17e0865f682
+  m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
+  id: e2ecba89-e889-4228-bbfd-8addba1fcf99
 --- !u!114 &264559603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -313,8 +310,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  id: 2aa01c4f-a3b4-45cd-a295-dae29ebafbc5
+  m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
+  id: 2dbe09a5-367e-4b61-8c54-c973a19e184f
 --- !u!114 &264559604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -326,37 +323,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  id: 54a77f8a-0271-477d-896b-82c244f32238
---- !u!114 &320790116
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 264559593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e7ab283536c7e743af4420dd9443577, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  reference: {fileID: 330585543}
-  text: 
-  number: 0
-  value: 0
---- !u!114 &320790117
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 264559593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  id: 1ef1d394-e8b3-44e2-8dbb-e565cd01902f
+  m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
+  id: 3f7e4020-c88d-4692-8882-e663db14eb71
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -487,7 +455,6 @@ MonoBehaviour:
   m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
-  m_Version: 2
   m_TaaSettings:
     m_Quality: 3
     m_FrameInfluence: 0.1
@@ -495,6 +462,7 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
 --- !u!114 &330585548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -506,8 +474,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  id: f5514aa2-7fa6-4d58-8ce1-035c26e425ef
+  m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
+  id: f93e79ed-b09c-4951-ba7e-7e041923f6a7
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -520,7 +488,6 @@ GameObject:
   - component: {fileID: 410087040}
   - component: {fileID: 410087042}
   - component: {fileID: 410087045}
-  - component: {fileID: 410087044}
   - component: {fileID: 410087043}
   - component: {fileID: 410087046}
   m_Layer: 0
@@ -622,17 +589,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Version: 3
   m_UsePipelineSettings: 1
   m_AdditionalLightsShadowResolutionTier: 2
-  m_LightLayerMask: 1
-  m_RenderingLayers: 1
   m_CustomShadowLayers: 0
-  m_ShadowLayerMask: 1
-  m_ShadowRenderingLayers: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 1
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!33 &410087043
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -641,18 +614,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 410087039}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &410087044
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 410087039}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cae3bec945db468489c57714daf0d3c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!54 &410087045
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -660,10 +621,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 410087039}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 1
-  m_Drag: 3.89
-  m_AngularDrag: 0.05
+  m_LinearDamping: 3.89
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -691,8 +652,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  id: df2615c5-75f1-42e7-b07d-20d77eecd12c
+  m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
+  id: db9070c3-e5de-4c5b-8748-48b1f480d60f
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -754,9 +715,9 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  id: 9af918ce-c047-4530-abb0-94bb92d0c492
---- !u!114 &1208009080
+  m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
+  id: 1bcc357c-d2ac-4e80-beac-b44f5a99075f
+--- !u!114 &995000020
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -767,8 +728,21 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  id: 7eea1f75-992b-4b42-9387-5a59d7132e22
+  m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
+  id: beb98b6e-6ad7-4d07-81fe-1bfcdc37d2ae
+--- !u!114 &1681783420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 264559593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
+  id: d629f45a-9442-4ba3-a446-833edfb64818
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
