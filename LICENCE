@@ -1,16 +1,23 @@
-Copyright (c) 2025 Tygo de Vries
+Custom License (C) Tygo de Vries
 
-Permission is hereby granted, free of charge, to any person or organization to use, copy, and incorporate this software (Samen) into their own projects, including commercial projects, subject to the following conditions:
+You may USE the TOOL, free of charge, for any purpose (including in games, apps, and personal projects) if:
+- You provide attribution to the tool 'Samen' in a clear place. (e.g., in credits)
+- Companies or individuals with gross revenue of $100,000 USD or more per year must obtain a commercial license for any use, including internal use.
+- You do not redistribute the TOOL.
 
-1. Any use of the Tool must include clear attribution to the original author: "Tygo de Vries".
+You may USE the SOURCE CODE, free of charge, if:
+- You do not use it in commercial or paid products or services.
+- You distribute any modified versions under the same license and with attribution intact.
+- You may create your own internal version of the tool, as long as:
+   - It is not sold or monetized
+   - It complies with the requirements listed above in the "USE the TOOL" section
 
-2. You may use the Tool as-is, without restriction, in both personal and commercial projects.
+You may NOT, NEVER:
+- Remove or alter any license notices or attribution, without the permission of the original author (Tygo de Vries).
+- Use this software or any part of it to train or fine-tune generative AI models. Including documentation.
 
-3. You may NOT:
-   - Redistribute, sell, or sublicense the Tool itself (in whole or in part) as a standalone product or library.
-   - Modify, rebrand, or create derivative tools that compete with or replace the Tool without explicit permission from the copyright holder.
-   - Remove or alter any attribution, copyright notices, or license terms in the Tool.
+This software is provided "as is", without warranty of any kind, express or implied.
+By using this software, or its code, you agree to these terms.
 
-4. This software is provided "as is", without warranty of any kind, express or implied.
-
-By using this software, you agree to these terms.
+Need a commercial license?
+Please contact zttdevries+samen@gmail.com
