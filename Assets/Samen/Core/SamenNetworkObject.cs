@@ -16,33 +16,35 @@ using static Unity.Burst.Intrinsics.X86.Avx;
 [ExecuteAlways]
 public class SamenNetworkObject : MonoBehaviour
 {
-
     private void Start()
     {
+        // We don't want to put this on objects outside of the session
         if (!SessionManager.InSessionScene())
         {
-            EditorUtility.DisplayDialog("Nope!", "You can not add this component to an object.", "OK!");
+            EditorUtility.DisplayDialog("Internal Component!", "You can not add this component to an object.", "OK!");
             DestroyImmediate(this);
         }
 
+        // Check all other exisiting objects
         SamenNetworkObject[] existingObjects = GameObject.FindObjectsByType<SamenNetworkObject>(FindObjectsSortMode.None); 
         foreach (SamenNetworkObject samenNetworkObject in existingObjects)
         {
+            // Skip ourselfs
             if (samenNetworkObject == this)
                 continue;
 
+            // If the ID already exists
             if(samenNetworkObject.id == this.id)
             {
                 // Create a new ID for ourselfs
                 this.id = null;
                 Create();
 
-
+                // There where 2 with the same ID, that must mean the user used Ctrl+D!
                 Connection.GetConnection().SendPacket(new OutgoingPacket(PacketType.ObjectDuplicate)
                     .WriteString(samenNetworkObject.id) // The ID of the object duplicated
                     .WriteString(this.id) // Our new id
                     );
-
             }
         }
     }
@@ -64,6 +66,7 @@ public class SamenNetworkObject : MonoBehaviour
     /// </summary>
     public void Create()
     {
+        // Make a new id for ourselfs
         if(id == null)
         {
             id = Guid.NewGuid().ToString();
@@ -73,11 +76,12 @@ public class SamenNetworkObject : MonoBehaviour
     }
 
     /// <summary>
-    /// Apply a change comming from the server
+    /// Apply a change coming from the server
     /// </summary>
     /// <param name="sessionChange"></param>
     public void ApplyChange(TransformChange sessionChange)
     {
+        // Just setting the correct values
         switch (sessionChange.type)
         {
             case TransformChangeType.Position:
@@ -98,24 +102,6 @@ public class SamenNetworkObject : MonoBehaviour
         }
 
         CacheValues();
-    }
-
-    public void OnComponentAdded(Component component)
-    {
-        OutgoingPacket packet = new OutgoingPacket(PacketType.CompomentAdded);
-        packet.WriteString(id);
-        packet.WriteString(component.GetType().FullName);
-
-        Connection.GetConnection().SendPacket(packet);
-    }
-
-    public void OnComponentRemoved(Component component)
-    {
-        OutgoingPacket packet = new OutgoingPacket(PacketType.ComponentRemoved);
-        packet.WriteString(id);
-        packet.WriteString(component.GetType().FullName);
-
-        Connection.GetConnection().SendPacket(packet);
     }
 
     /// <summary>
@@ -149,9 +135,6 @@ public class SamenNetworkObject : MonoBehaviour
 
     public void OnTransformParentChanged()
     {
-        Debug.Log("Parent Changed!");
-
-
         string parentId = "none";
         if (transform.parent != null)
         {
@@ -159,6 +142,7 @@ public class SamenNetworkObject : MonoBehaviour
             parentId = parent.id;
         }
 
+        // Lets make sure everyone got that!
         Connection.GetConnection().SendPacket(new OutgoingPacket(PacketType.ParentChange)
             .WriteString(id)
             .WriteString(parentId));

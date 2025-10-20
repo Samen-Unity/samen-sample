@@ -13,8 +13,6 @@ using UnityEngine;
 
 namespace Samen.Network
 {
-
-    
     public enum PacketType
     {
         Authenticate,
@@ -28,19 +26,14 @@ namespace Samen.Network
         ChatMessage,
         ParentChange,
         PrefabCreated,
-        Ping,
-        ComponentUpdated,
-        CompomentAdded,
-        ComponentRemoved
+        Ping
     }
-
     public enum ConnectionState
     {
         Disconnected,
         Connecting,
         Connected
     }
-
     public class Connection
     {
         public bool HasConnection()

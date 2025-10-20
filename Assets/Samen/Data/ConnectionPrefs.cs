@@ -9,6 +9,10 @@ using UnityEditor;
 
 namespace Assets.Samen.Data
 {
+
+    /// <summary>
+    /// Simple wrapper for easy use.
+    /// </summary>
     public static class ConnectionPrefs
     {
         private const string IP_KEY = "SamenConnection_IP";
