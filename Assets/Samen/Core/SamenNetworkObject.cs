@@ -41,7 +41,7 @@ public class SamenNetworkObject : MonoBehaviour
                 Create();
 
                 // There where 2 with the same ID, that must mean the user used Ctrl+D!
-                Connection.GetConnection().SendPacket(new OutgoingPacket(PacketType.ObjectDuplicate)
+                Connection.GetConnection().SendPacket(new OutgoingPacket(PacketType.ObjectDuplicated)
                     .WriteString(samenNetworkObject.id) // The ID of the object duplicated
                     .WriteString(this.id) // Our new id
                     );

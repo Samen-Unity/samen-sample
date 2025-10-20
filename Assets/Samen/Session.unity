@@ -165,11 +165,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8571751394273537349, guid: 53b0c952f3b132245ad747f09aa13cb0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.5
+      value: -2.28
       objectReference: {fileID: 0}
     - target: {fileID: 8571751394273537349, guid: 53b0c952f3b132245ad747f09aa13cb0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -4
+      value: -5.53
       objectReference: {fileID: 0}
     - target: {fileID: 8571751394273537349, guid: 53b0c952f3b132245ad747f09aa13cb0, type: 3}
       propertyPath: m_LocalRotation.w
@@ -205,7 +205,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 6563927843861906501, guid: 53b0c952f3b132245ad747f09aa13cb0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1933690002}
+      addedObject: {fileID: 862884509}
     - targetCorrespondingSourceObject: {fileID: 4398587914179103300, guid: 53b0c952f3b132245ad747f09aa13cb0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 264559604}
@@ -223,7 +223,7 @@ PrefabInstance:
       addedObject: {fileID: 264559600}
     - targetCorrespondingSourceObject: {fileID: 1151399279189532306, guid: 53b0c952f3b132245ad747f09aa13cb0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1637955412}
+      addedObject: {fileID: 848272217}
   m_SourcePrefab: {fileID: 100100000, guid: 53b0c952f3b132245ad747f09aa13cb0, type: 3}
 --- !u!1 &264559593 stripped
 GameObject:
@@ -272,7 +272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
-  id: d104582e-11bb-4b72-849a-ca2b7b927066
+  id: 8e43d625-165a-4cb3-9b9c-6b24cd23e04c
 --- !u!114 &264559601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -285,7 +285,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
-  id: 49ab64b3-a9ea-441f-975d-66f45b315772
+  id: aced7efe-ca8f-446e-abf0-df1043b0e306
 --- !u!114 &264559602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -298,7 +298,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
-  id: 485a5ea4-101a-4c16-9da2-f2110c732487
+  id: 4dceffe2-8e39-41ba-952e-28502113c0e4
 --- !u!114 &264559603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -311,7 +311,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
-  id: 6e05bcff-094f-43fb-bc5e-c3c1f9d677af
+  id: 5d2c590c-30d8-4de9-8d07-cdf5bfb8804c
 --- !u!114 &264559604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -324,7 +324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
-  id: 54c327fa-74ce-4bc1-9f10-db1cf6cc35bb
+  id: 748334dd-43bf-4144-8362-071483b9cd32
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -475,7 +475,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
-  id: 39c86f12-913f-4c2e-a878-f4c4ab263037
+  id: aec033a1-9b00-45b1-9e99-edc78268f246
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -653,7 +653,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
-  id: 0a538c95-87ad-4ffc-bbc8-b4a6dc9f6da2
+  id: 2506f5e4-e6fd-4f06-97f8-ecf755ed86c9
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -716,8 +716,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
-  id: b2e09cc1-5d9d-464f-bc79-7c976b7bf3a8
---- !u!114 &1637955412
+  id: cbe49472-8590-4b34-8434-adb612473bdc
+--- !u!114 &848272217
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -729,8 +729,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
-  id: bf6add60-6ea2-4c45-aa2d-67b8a0068ebd
---- !u!114 &1933690002
+  id: 9d62edf4-85d3-4c69-89e2-698de8729ebe
+--- !u!114 &862884509
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -742,7 +742,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d81474844a77043a116a9ebaddb131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SamenNetworkObject
-  id: 0849608d-015a-4da2-93b2-b4d213c468f1
+  id: 0d1af598-7fff-414d-b6e4-fc1072e63bd3
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

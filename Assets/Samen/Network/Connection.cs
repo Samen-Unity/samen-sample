@@ -13,20 +13,71 @@ using UnityEngine;
 
 namespace Samen.Network
 {
-    public enum PacketType
+    /// <summary>
+    /// Types of packets
+    /// </summary>
+    public enum PacketType : int
     {
-        Authenticate,
-        SessionExists,
-        CreateSession,
-        JoinSession,
-        ObjectChange,
-        RequestSync,
-        ObjectDestroyed,
-        ObjectDuplicate,
-        ChatMessage,
-        ParentChange,
-        PrefabCreated,
-        Ping
+        /// <summary>
+        /// Authentication packet for username and accept
+        /// </summary>
+        Authenticate = 0,
+
+        /// <summary>
+        /// A packet to check if a spesific session exists
+        /// </summary>
+        SessionExists = 1,
+
+        /// <summary>
+        /// A packet to create a session
+        /// </summary>
+        CreateSession = 2,
+
+        /// <summary>
+        /// A packet to join a session
+        /// </summary>
+        /// 
+        JoinSession = 3,
+
+        /// <summary>
+        /// A packet send whenever an object transform was changed
+        /// </summary>
+        ObjectChange = 4,
+
+        /// <summary>
+        /// A packet send whenever the client is ready to receive a session's history
+        /// </summary>
+        RequestSync = 5,
+
+        /// <summary>
+        /// A packet send whenever an object was destroyed
+        /// </summary>
+        ObjectDestroyed = 6,
+
+        /// <summary>
+        /// A packet send whenever an object was duplicated
+        /// </summary>
+        ObjectDuplicated = 7,
+
+        /// <summary>
+        /// A packet for chat messages
+        /// </summary>
+        ChatMessage = 8,
+
+        /// <summary>
+        /// A parent of an object was changed.
+        /// </summary>
+        ParentChange = 9,
+
+        /// <summary>
+        /// A prefab was added into the scene
+        /// </summary>
+        PrefabCreated = 10,
+
+        /// <summary>
+        /// A packet for a user-ping
+        /// </summary>
+        Ping = 11
     }
     public enum ConnectionState
     {
@@ -273,13 +324,18 @@ namespace Samen.Network
 
     public class IncomingPacketListener
     {
-        public PacketType type;
+        public int type;
         public Action<IncomingPacket> @delegate;
 
-        public IncomingPacketListener(PacketType type, Action<IncomingPacket> @delegate)
+        public IncomingPacketListener(int type, Action<IncomingPacket> @delegate)
         {
             this.type = type;
             this.@delegate = @delegate;   
+        }
+
+        public IncomingPacketListener(PacketType packetType, Action<IncomingPacket> @delegate) : this((int) packetType, @delegate)
+        {
+
         }
 
         public void Destroy()
@@ -369,11 +425,16 @@ namespace Samen.Network
             return incomingPacket;
         }
 
-        public PacketType type;
-        public IncomingPacket(PacketType type)
+        public int type;
+        public IncomingPacket(int type)
         {
             this.type = type;
             data = new List<byte[]>();
+        }
+
+        public IncomingPacket(PacketType type) : this((int)type)
+        {
+
         }
 
         private List<byte[]> data;
@@ -451,12 +512,19 @@ namespace Samen.Network
     public class OutgoingPacket
     {
 
-        public PacketType packetType { private set; get; }
+        public int packetType { private set; get; }
+
+
+        public OutgoingPacket(PacketType packetType) : this((int) packetType)
+        {
+
+        }
+
         /// <summary>
         /// Create a packet of a spesific type
         /// </summary>
         /// <param name="packetType"></param>
-        public OutgoingPacket(PacketType packetType)
+        public OutgoingPacket(int packetType)
         {
             int type = (int) packetType;
             this.packetType = packetType;

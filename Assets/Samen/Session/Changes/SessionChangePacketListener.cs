@@ -27,7 +27,7 @@ namespace Samen.Session
         static void StartListening()
         {
             Connection.GetConnection().Listen(PacketType.ObjectDestroyed, OnObjectDestroyedPacket);
-            Connection.GetConnection().Listen(PacketType.ObjectDuplicate, OnObjectDuplicatedPacket);
+            Connection.GetConnection().Listen(PacketType.ObjectDuplicated, OnObjectDuplicatedPacket);
             Connection.GetConnection().Listen(PacketType.ObjectChange, OnObjectTransformChangePacket);
             Connection.GetConnection().Listen(PacketType.ChatMessage, OnChatMessagePacket);
             Connection.GetConnection().Listen(PacketType.ParentChange, OnParentChangePacket);
